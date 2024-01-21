@@ -1,0 +1,5 @@
+# env file
+.env
+
+# database
+chroma.log
