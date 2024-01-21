@@ -2,8 +2,8 @@
 .env
 
 # intellij idea
-.idea
+/.idea/
 
 # database
 chroma.log
-./database/data/
+/database/data/
