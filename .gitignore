@@ -1,5 +1,9 @@
 # env file
 .env
 
+# intellij idea
+.idea
+
 # database
 chroma.log
+./database/data/
