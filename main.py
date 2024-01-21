@@ -15,6 +15,7 @@ from openai import OpenAI as SDKOpenAI
 
 # DTO
 from dto import openai_dto
+from prompt import openai_prompt
 
 # ETC
 import os
@@ -25,8 +26,12 @@ import configparser
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# description: load config variables from openai_config.ini file
+CONFIG_FILE_PATH = "prompt/openai_config.ini"
 config = configparser.ConfigParser()
+config.read(CONFIG_FILE_PATH)
 
+# description: make fastapi app
 app = FastAPI()
 
 # description: prevent CORS error
@@ -43,6 +48,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.post("/chatgpt/langchain/case")
+def get_langchain_case(data: openai_dto.PromptRequest):
+    # description: use langchain
+
+    config_normal = config['NESS_NORMAL']
+
+    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
+                            model_name=config_normal['MODEL_NAME'],  # 모델명
+                            openai_api_key=OPENAI_API_KEY  # API 키
+                            )
+    question = data.prompt
+
+    # description: give NESS's instruction as for case analysis
+    my_template = openai_prompt.Template.case_template
+
+    prompt = PromptTemplate.from_template(my_template)
+    return chat_model.predict(prompt.format(question=question))
 
 
 @app.post("/chatgpt/langchain/normal")
@@ -67,10 +92,10 @@ def get_langchain_normal():
 @app.post("/chatgpt/langchain/rag")
 def get_langchain_rag(data: openai_dto.PromptRequest):
     # description: use langchain
-    chat_model = ChatOpenAI(temperature=0,                      # 창의성 (0.0 ~ 2.0)
-                            max_tokens=2048,                    # 최대 토큰수
-                            model_name='gpt-3.5-turbo-1106',    # 모델명
-                            openai_api_key=OPENAI_API_KEY       # API 키
+    chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=2048,  # 최대 토큰수
+                            model_name='gpt-3.5-turbo-1106',  # 모델명
+                            openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
 
