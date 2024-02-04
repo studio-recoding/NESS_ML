@@ -49,7 +49,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.post("/chatgpt/langchain/case")
 def get_langchain_case(data: openai_dto.PromptRequest):
     # description: use langchain
@@ -121,55 +120,7 @@ def get_langchain_rag(data: openai_dto.PromptRequest):
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    return chat_model.predict(prompt.format(question=question, schedule=schedule))
-
-
-# @app.post("/chatgpt/sdk/normal")
-# def get_sdk_normal():
-#     # description: only use OpenAI SDK
-#     client = SDKOpenAI(
-#         api_key=OPENAI_API_KEY
-#     )
-#
-#     chat_completion = client.chat.completions.create(
-#         messages=[
-#             {
-#                 "role": "user",
-#                 "content": "fastapi가 뭐야? 한 줄로 간결하고 친절하게 답변해줘.",
-#             }
-#         ],
-#         model="gpt-4",
-#     )
-#     return chat_completion.choices[0].message.content
-#
-#
-# @app.post("/chatgpt/sdk/rag")
-# def get_sdk_rag(data: openai_dto.PromptRequest):
-#     # description: only use OpenAI SDK
-#     client = SDKOpenAI(
-#         api_key=OPENAI_API_KEY
-#     )
-#
-#     question = data.prompt  # 임시적으로 하드코딩
-#
-#     schedule = vectordb.search_db_query(question)  # vector db에서 검색
-#
-#     content = f"""consider yourself as assistant who takes care of user's schedule,
-#                 and answer the question refer to the user's schedule. Notice that you should answer in Korean.
-#                 question: {question},
-#                 schedule: {schedule}"""
-#
-#     chat_completion = client.chat.completions.create(
-#         messages=[
-#             {
-#                 "role": "user",
-#                 "content": content,
-#             }
-#         ],
-#         model="gpt-4",
-#     )
-#     return chat_completion.choices[0].message.content
-
+    return chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
 
 if __name__ == "__main__":
     uvicorn.run(host="0.0.0.0", port=8000, app=app)
