@@ -1,4 +1,5 @@
 class Template:
+    recommendation_template = """한 줄 추천 기능 템플릿"""
     # case 분류 잘 안됨 - 수정 필요
     case_classify_template = """
                     Task: User Chat Classification
@@ -12,7 +13,7 @@ class Template:
                     The question requires accessing or searching through the user's previous schedule information. This might involve past schedules, preferences, or other relevant details.
                     
                     After analyzing the content of the question, return the most suitable case number.
-                    YOU MUST ANSWER ONLY WITH NUMBER (1, 2, 3). OTHER WORDS ARE PROHIBITED. IT IS VERY IMPORTANT TO RETURN ONLY THE NUMBERS.
+                    YOU MUST ANSWER ONLY WITH NUMBER (1, 2, 3). OTHER WORDS ARE PROHIBITED. IT IS VERY IMPORTANT TO RETURN ONLY THE NUMBERS. NO YAPPING!
                     
                     Example 1:
                     User Chat: "What's the weather like tomorrow?"

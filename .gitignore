@@ -6,7 +6,7 @@
 
 # database
 chroma.log
-/database/data/
+/app/database/data/
 
 # all __pycache__
 **/__pycache__/
