@@ -7,7 +7,7 @@ on:
     branches: [ main, dev ]
 
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/myproject
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/ness-fastapi
   VERSION: ${{ github.sha }}
   NAME: ness-fastapi
   # Docker image 를 ghcr.io 에 올릴 때 우리의github이름/이미지이름 으로 저장한다. 이미지이름을 정해주면 된다.
@@ -62,10 +62,10 @@ jobs:
 
       - name: Docker run
         run: |
-#          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
-#          docker run -d -p 3000:3000 --name newproject --restart always ${{ env.DOCKER_IMAGE }}:latest
-               docker pull ${{ env.DOCKER_IMAGE }}:latest
-               docker stop ${{ env.NAME }} || true
-               docker rm ${{ env.NAME }} || true
-               docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
-               docker run -d -p 3000:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+          docker stop ${{ env.NAME }} && docker rm ${{ env.NAME }} && docker rmi ${{ env.DOCKER_IMAGE }}:latest
+          docker run -d -p 3000:3000 --name ness-fastapi --restart always ${{ env.DOCKER_IMAGE }}:latest
+#          docker pull ${{ env.DOCKER_IMAGE }}:latest
+#          docker stop ${{ env.NAME }} || true
+#          docker rm ${{ env.NAME }} || true
+#          docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
+#          docker run -d -p 3000:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
