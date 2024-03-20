@@ -82,7 +82,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Remove old Docker image
-        run: docker rmi -f ${{ env.DOCKER_IMAGE }}:latest || true
+        run: docker rmi -f $(docker images -aq) || true #docker rmi -f ${{ env.DOCKER_IMAGE }}:latest || true
 
       - name: Docker run
         run: |
