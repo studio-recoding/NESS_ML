@@ -69,6 +69,7 @@ jobs:
 ##          docker rm ${{ env.NAME }} || true
 ##          docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
 ##          docker run -d -p 3000:3000 --name ${{ env.NAME }} --restart always ${{ env.DOCKER_IMAGE }}:latest
+# EC2 볼륨 16기가로 늘려서 테스트
   deploy:
     needs: build
     name: Deploy
