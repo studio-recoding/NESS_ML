@@ -61,11 +61,10 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo NAME=${{ env.NAME }} > .env
-          echo VERSION=${{ env.VERSION }} >> .env
-          echo OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} >> .env
-          echo CHROMA_DB_IP_ADDRESS=${{ secrets.CHROMA_DB_IP_ADDRESS }} >> .env
-          cat .env
+          echo "$DEV_ENV" > .env
+        env:
+          DEV_ENV: ${{ secret.DEV_ENV }}
+
 
       - name: Remove old Docker image
         run: docker rmi -f $(docker images -aq) || true #docker rmi -f ${{ env.DOCKER_IMAGE }}:latest || true
