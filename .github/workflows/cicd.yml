@@ -59,6 +59,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
       - name: Create .env file
         run: |
+          touch .env
           echo NAME=${{ env.NAME }} > .env
           echo VERSION=${{ env.VERSION }} >> .env
           echo OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} >> .env
