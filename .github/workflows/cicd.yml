@@ -27,8 +27,8 @@ jobs:
         run: |
           echo "CHROMA_DB_IP_ADDRESS=${{ secrets.CHROMA_DB_IP_ADDRESS }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-          shell: bash
-
+        shell: bash
+        
       - name: Setup docker buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
