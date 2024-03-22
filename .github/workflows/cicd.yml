@@ -63,7 +63,7 @@ jobs:
           touch .env
           echo "$DEV_ENV" > .env
         env:
-          DEV_ENV: ${{ secret.DEV_ENV }}
+          DEV_ENV: ${{ secrets.DEV_ENV }}
 
 
       - name: Remove old Docker image
