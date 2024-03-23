@@ -1,7 +1,6 @@
 chromadb==0.4.22
 fastapi==0.109.0
 uvicorn==0.26.0
-langchain==0.1.1
 langchain-community==0.0.13
 openai==1.8.0
 python-dotenv==1.0.0
