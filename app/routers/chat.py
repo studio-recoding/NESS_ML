@@ -43,7 +43,7 @@ async def get_langchain_case(data: openai_dto.PromptRequest):
     my_template = openai_prompt.Template.case_classify_template
 
     prompt = PromptTemplate.from_template(my_template)
-    case = await chat_model.predict(prompt.format(question=question))
+    case = chat_model.predict(prompt.format(question=question))
 
     print(case)
     case = int(case)
@@ -73,12 +73,14 @@ async def get_langchain_normal(data: openai_dto.PromptRequest): # case 1 : norma
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
+    # 기존 모델 문제 생김
+    # chat_model = LangchainOpenAI(openai_api_key=OPENAI_API_KEY)
 
     # description: give NESS's ideal instruction as template
     my_template = openai_prompt.Template.case1_template
 
     prompt = PromptTemplate.from_template(my_template)
-    response = await chat_model.predict(prompt.format(output_language="Korean", question=question))
+    response = chat_model.predict(prompt.format(output_language="Korean", question=question))
     print(response)
     return response
 
@@ -96,7 +98,7 @@ async def get_langchain_schedule(data: openai_dto.PromptRequest):
     case2_template = openai_prompt.Template.case2_template
 
     prompt = PromptTemplate.from_template(case2_template)
-    response = await chat_model.predict(prompt.format(output_language="Korean", question=question))
+    response = chat_model.predict(prompt.format(output_language="Korean", question=question))
     print(response)
     return response
 
@@ -122,6 +124,6 @@ async def get_langchain_rag(data: openai_dto.PromptRequest):
     # 여기서는 chat_model.predict가 비동기 함수인지, 동기 함수인지에 따라 처리가 달라질 수 있습니다.
     # 만약 비동기 함수라면 await를 사용해야 합니다. 아래 코드는 동기 함수를 가정하고 작성되었습니다.
     # 비동기 함수라면, 예: response = await chat_model.predict(...) 형태로 수정해야 합니다.
-    response = await chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
+    response = chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
     print(response)
     return response
