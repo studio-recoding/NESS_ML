@@ -77,7 +77,7 @@ jobs:
 
 
       - name: Remove old Docker image
-        run: docker rmi -f $(docker images -aq) || true 
+        run: docker rmi -f $(docker images -aq) || true
 
       - name: Docker run
         run: |

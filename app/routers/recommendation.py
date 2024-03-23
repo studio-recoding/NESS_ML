@@ -23,7 +23,7 @@ config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
 @router.get("/main")
-def get_recommendation():
+async def get_recommendation():
 
     # 모델
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -37,4 +37,4 @@ def get_recommendation():
     recommendation_template = openai_prompt.Template.recommendation_template
 
     prompt = PromptTemplate.from_template(recommendation_template)
-    return chat_model.predict(prompt.format())
+    return await chat_model.predict(prompt.format())
