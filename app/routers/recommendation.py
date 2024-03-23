@@ -37,4 +37,4 @@ async def get_recommendation():
     recommendation_template = openai_prompt.Template.recommendation_template
 
     prompt = PromptTemplate.from_template(recommendation_template)
-    return await chat_model.predict(prompt.format())
+    return chat_model.predict(prompt.format())
