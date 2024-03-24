@@ -3,21 +3,7 @@ import uvicorn
 from dotenv import load_dotenv
 
 # BACKEND
-from fastapi import FastAPI
-from fastapi import FastAPI, HTTPException
-import asyncio
-
-# VECTOR DB Module
-import app.database.chroma_db as vectordb
-
-# AI
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-
-# DTO
-from app.dto import openai_dto
-from app.prompt import openai_prompt
-from app.dto.db_dto import AddScheduleDTO
+from fastapi import FastAPI, Depends
 
 # ETC
 import os

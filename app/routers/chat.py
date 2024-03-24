@@ -3,11 +3,11 @@ import configparser
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
-from app.dto import openai_dto
+from app.dto.openai_dto import PromptRequest, ChatResponse
 from app.prompt import openai_prompt
 
 import app.database.chroma_db as vectordb
@@ -26,8 +26,8 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-@router.post("/case")
-async def get_langchain_case(data: openai_dto.PromptRequest):
+@router.post("/case", status_code=status.HTTP_200_OK, response_model=ChatResponse)
+async def get_langchain_case(data: PromptRequest) -> ChatResponse:
     # description: use langchain
 
     config_normal = config['NESS_NORMAL']
@@ -64,7 +64,7 @@ async def get_langchain_case(data: openai_dto.PromptRequest):
 
 # case 1 : normal
 #@router.post("/case/normal") # 테스트용 엔드포인트
-async def get_langchain_normal(data: openai_dto.PromptRequest): # case 1 : normal
+async def get_langchain_normal(data: PromptRequest) -> ChatResponse: # case 1 : normal
     print("running case 1")
     # description: use langchain
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -82,11 +82,11 @@ async def get_langchain_normal(data: openai_dto.PromptRequest): # case 1 : norma
     prompt = PromptTemplate.from_template(my_template)
     response = chat_model.predict(prompt.format(output_language="Korean", question=question))
     print(response)
-    return response
+    return ChatResponse(ness=response)
 
 # case 2 : 일정 생성
 #@router.post("/case/make_schedule") # 테스트용 엔드포인트
-async def get_langchain_schedule(data: openai_dto.PromptRequest):
+async def get_langchain_schedule(data: PromptRequest) -> ChatResponse:
     print("running case 2")
     # description: use langchain
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -100,11 +100,11 @@ async def get_langchain_schedule(data: openai_dto.PromptRequest):
     prompt = PromptTemplate.from_template(case2_template)
     response = chat_model.predict(prompt.format(output_language="Korean", question=question))
     print(response)
-    return response
+    return ChatResponse(ness=response)
 
 # case 3 : rag
 #@router.post("/case/rag") # 테스트용 엔드포인트
-async def get_langchain_rag(data: openai_dto.PromptRequest):
+async def get_langchain_rag(data: PromptRequest) -> ChatResponse:
     print("running case 3")
     # description: use langchain
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -121,9 +121,6 @@ async def get_langchain_rag(data: openai_dto.PromptRequest):
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    # 여기서는 chat_model.predict가 비동기 함수인지, 동기 함수인지에 따라 처리가 달라질 수 있습니다.
-    # 만약 비동기 함수라면 await를 사용해야 합니다. 아래 코드는 동기 함수를 가정하고 작성되었습니다.
-    # 비동기 함수라면, 예: response = await chat_model.predict(...) 형태로 수정해야 합니다.
     response = chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
     print(response)
-    return response
+    return ChatResponse(ness=response)
