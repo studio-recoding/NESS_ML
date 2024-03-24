@@ -2,7 +2,7 @@ import configparser
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 
 from app.dto.db_dto import AddScheduleDTO
 from app.database.chroma_db import add_db_data, get_chroma_client
@@ -22,7 +22,7 @@ config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
 
-@router.post("/add_schedule")
+@router.post("/add_schedule", status_code=status.HTTP_201_CREATED)
 async def add_schedule_endpoint(schedule_data: AddScheduleDTO, chroma_client=Depends(get_chroma_client)):
     try:
         # 직접 `add_db_data` 함수를 비동기적으로 호출합니다.
