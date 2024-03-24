@@ -3,7 +3,7 @@ import uvicorn
 from dotenv import load_dotenv
 
 # BACKEND
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Depends
 
 # ETC
 import os

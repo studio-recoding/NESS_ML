@@ -3,6 +3,9 @@ import chromadb
 from chromadb.utils import embedding_functions
 from chromadb.config import Settings
 
+# FAST API
+from fastapi import Depends
+
 # ETC
 import os
 import datetime
@@ -11,12 +14,6 @@ from app.dto.db_dto import AddScheduleDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
-# # 로컬에 ChromaDB가 저장된 경우
-# DIR = os.path.dirname(os.path.abspath(__file__))
-# DB_PATH = os.path.join(DIR, 'data')
-# # 로컬 디스크에서 ChromaDB 실행: allow_reset으로 데이터베이스 초기화, anonymized_telemetry를 False로 설정하여 텔레메트리 수집 비활성화
-# chroma_client = chromadb.PersistentClient(path=DB_PATH,
-#                                           settings=Settings(allow_reset=True, anonymized_telemetry=False))
 
 # description: 원격 EC2 인스턴스에서 ChromaDB에 연결
 chroma_client = chromadb.HttpClient(host=CHROMA_DB_IP_ADDRESS, port=8000)
@@ -56,3 +53,6 @@ async def add_db_data(schedule_data: AddScheduleDTO):
         metadatas=[{"datetime": schedule_data.schedule_datetime, "member": schedule_data.member_id, "category": schedule_data.category}]
     )
     return True
+
+def get_chroma_client():
+    return chroma_client

@@ -2,9 +2,10 @@ import configparser
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from app.dto.db_dto import AddScheduleDTO
+from app.database.chroma_db import add_db_data, get_chroma_client
 
 router = APIRouter(
     prefix="/chromadb",
@@ -22,11 +23,10 @@ config.read(CONFIG_FILE_PATH)
 
 
 @router.post("/add_schedule")
-async def add_schedule_endpoint(schedule_data: AddScheduleDTO, vectordb=None):
+async def add_schedule_endpoint(schedule_data: AddScheduleDTO, chroma_client=Depends(get_chroma_client)):
     try:
-        # vectordb.add_db_data 함수를 비동기적으로 호출합니다.
-        await vectordb.add_db_data(schedule_data)
+        # 직접 `add_db_data` 함수를 비동기적으로 호출합니다.
+        await add_db_data(schedule_data)
         return {"message": "Schedule added successfully"}
     except Exception as e:
-        # 에러 처리: 에러가 발생하면 HTTP 500 응답을 반환합니다.
         raise HTTPException(status_code=500, detail=str(e))
