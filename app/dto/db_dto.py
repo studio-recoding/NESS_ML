@@ -7,4 +7,6 @@ class AddScheduleDTO(BaseModel):
     schedule_id: int
     member_id: int
     category: str
+    location: str
+    person: str
 

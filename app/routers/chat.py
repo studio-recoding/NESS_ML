@@ -121,9 +121,6 @@ async def get_langchain_rag(data: PromptRequest) -> ChatResponse:
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    # 여기서는 chat_model.predict가 비동기 함수인지, 동기 함수인지에 따라 처리가 달라질 수 있습니다.
-    # 만약 비동기 함수라면 await를 사용해야 합니다. 아래 코드는 동기 함수를 가정하고 작성되었습니다.
-    # 비동기 함수라면, 예: response = await chat_model.predict(...) 형태로 수정해야 합니다.
     response = chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
     print(response)
     return ChatResponse(ness=response)
