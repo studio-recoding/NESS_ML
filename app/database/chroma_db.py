@@ -50,7 +50,7 @@ async def add_db_data(schedule_data: AddScheduleDTO):
     schedules.add(
         documents=[schedule_data.data],
         ids=[str(schedule_data.schedule_id)],
-        metadatas=[{"datetime": schedule_data.schedule_datetime, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
+        metadatas=[{"datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
     )
     return True
 
