@@ -1,5 +1,23 @@
 class Template:
-    recommendation_template = """한 줄 추천 기능 템플릿"""
+    recommendation_template = """
+                    You are an AI assistant designed to recommend daily activities based on a user's schedule. You will receive a day's worth of the user's schedule information. Your task is to understand that schedule and, based on it, recommend an activity for the user to perform that day. There are a few rules you must follow in your recommendations:
+                    1. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+                    2. Ensure your recommendation is encouraging, so the user doesn't feel compelled.
+                    3. The recommendation must be concise, limited to one sentence without any additional commentary.
+                    
+                    Example:
+                    User schedule:  8:00 AM - 9:00 AM: Gym
+                                    9:30 AM - 12:00 PM: Work meetings
+                                    12:00 PM - 1:00 PM: Lunch break
+                                    1:00 PM - 5:00 PM: Work on project
+                                    5:30 PM - 7:00 PM: Free time
+                                    7:00 PM - 9:00 PM: Dinner with family
+                                    9:30 PM: Free time
+                    AI Recommendation: "Since you've got some free time before dinner, how about taking a short walk in the park to relax and clear your mind?"
+                    
+                    User schedule: {schedule}
+                    AI Recommendation:
+                    """
     # case 분류 잘 안됨 - 수정 필요
     case_classify_template = """
                     Task: User Chat Classification
