@@ -57,19 +57,23 @@ async def add_db_data(schedule_data: AddScheduleDTO):
 # 메인페이지 한 줄 추천 기능에 사용하는 함수
 # 유저의 id, 해당 날짜로 필터링
 async def db_recommendation_main(user_data: RecommendationMainRequestDTO):
+    member = user_data.member_id
+    schedule_datetime_start = user_data.schedule_datetime_start
+    schedule_datetime_end = user_data.schedule_datetime_end
     results = schedules.query(
-        user_persona=["hard working"],
+        query_texts=["hard working"],
         n_results=5,
         where={"$and" :
                [
-                   {"member": {"$eq": int(user_data.member_id)}},
+                   {"member": {"$eq": int(member)}},
                    {"datetime_start": {
-                       "$gte": user_data.schedule_datetime_start, # greater than or equal
-                       "$lt": user_data.schedule_datetime_end # less than
+                       "$eq": schedule_datetime_start, # greater than or equal
+                       # "$lt": schedule_datetime_end # less than
                    }}
                ]}
         # where_document={"$contains":"search_string"}  # optional filter
     )
+    return results['documents']
 
 def get_chroma_client():
     return chroma_client

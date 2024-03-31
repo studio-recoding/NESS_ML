@@ -25,11 +25,11 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-@router.get("/main", status_code=status.HTTP_200_OK)
+@router.post("/main", status_code=status.HTTP_200_OK)
 async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatResponse:
 
     # 모델
-    chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
+    chat_model = ChatOpenAI(temperature=0.5,  # 창의성 (0.0 ~ 2.0)
                             max_tokens=2048,  # 최대 토큰수
                             model_name='gpt-3.5-turbo-1106',  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
@@ -38,10 +38,12 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatRes
     # vectordb에서 유저의 정보를 가져온다.
     schedule = await vectordb.db_recommendation_main(user_data)
 
+    print(schedule)
+
     # 템플릿
     recommendation_template = openai_prompt.Template.recommendation_template
 
     prompt = PromptTemplate.from_template(recommendation_template)
-    result = await chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
+    result = chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
     print(result)
     return ChatResponse(ness=result)
