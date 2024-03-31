@@ -2,11 +2,14 @@ import configparser
 import os
 
 from dotenv import load_dotenv
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, status
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
+from app.dto.db_dto import RecommendationMainRequestDTO
+from app.dto.openai_dto import ChatResponse
 from app.prompt import openai_prompt
+import app.database.chroma_db as vectordb
 
 router = APIRouter(
     prefix="/recommendation",
@@ -22,8 +25,8 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-@router.get("/main")
-async def get_recommendation():
+@router.get("/main", status_code=status.HTTP_200_OK)
+async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatResponse:
 
     # 모델
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -32,9 +35,13 @@ async def get_recommendation():
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
 
+    # vectordb에서 유저의 정보를 가져온다.
+    schedule = await vectordb.db_recommendation_main(user_data)
 
     # 템플릿
     recommendation_template = openai_prompt.Template.recommendation_template
 
     prompt = PromptTemplate.from_template(recommendation_template)
-    return chat_model.predict(prompt.format())
+    result = await chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
+    print(result)
+    return ChatResponse(ness=result)
