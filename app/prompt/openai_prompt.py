@@ -6,14 +6,8 @@ class Template:
                     3. The recommendation must be concise, limited to one sentence without any additional commentary.
                     
                     Example:
-                    User schedule:  8:00 AM - 9:00 AM: Gym
-                                    9:30 AM - 12:00 PM: Work meetings
-                                    12:00 PM - 1:00 PM: Lunch break
-                                    1:00 PM - 5:00 PM: Work on project
-                                    5:30 PM - 7:00 PM: Free time
-                                    7:00 PM - 9:00 PM: Dinner with family
-                                    9:30 PM: Free time
-                    AI Recommendation: "Since you've got some free time before dinner, how about taking a short walk in the park to relax and clear your mind?"
+                    User schedule:  [Practice guitar, Calculate accuracy, Study backend development, Run AI models in the lab, Study NEST.JS]
+                    AI Recommendation: "Your day is filled with learning and research. how about taking a short walk in between studies?"
                     
                     User schedule: {schedule}
                     AI Recommendation:
