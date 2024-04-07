@@ -47,10 +47,11 @@ async def search_db_query(query):
 # description: DB에 저장하는 함수
 # 스프링 백엔드로부터 chroma DB에 저장할 데이터를 받아 DB에 추가한다.
 async def add_db_data(schedule_data: AddScheduleDTO):
+    schedule_date = schedule_data.schedule_datetime_start.split("T")[0]
     schedules.add(
         documents=[schedule_data.data],
         ids=[str(schedule_data.schedule_id)],
-        metadatas=[{"datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
+        metadatas=[{"date": schedule_date, "datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
     )
     return True
 
@@ -60,17 +61,17 @@ async def db_recommendation_main(user_data: RecommendationMainRequestDTO):
     member = user_data.member_id
     schedule_datetime_start = user_data.schedule_datetime_start
     schedule_datetime_end = user_data.schedule_datetime_end
+    schedule_date = schedule_datetime_start.split("T")[0]
+    persona = user_data.user_persona or "hard working"
     results = schedules.query(
-        query_texts=["hard working"],
+        query_texts=[persona],
         n_results=5,
-        where={"$and" :
+        where={"$and":
                [
                    {"member": {"$eq": int(member)}},
-                   {"datetime_start": {
-                       "$eq": schedule_datetime_start, # greater than or equal
-                       # "$lt": schedule_datetime_end # less than
-                   }}
-               ]}
+                   {"date": {"$eq": schedule_date}}
+               ]
+        }
         # where_document={"$contains":"search_string"}  # optional filter
     )
     return results['documents']
