@@ -10,3 +10,6 @@ class ChatResponse(BaseModel):
 class ChatCaseResponse(BaseModel):
     ness: str
     case: int
+
+class TagsResponse(BaseModel):
+    tags: list
