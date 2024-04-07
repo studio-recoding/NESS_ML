@@ -10,7 +10,7 @@ from fastapi import Depends
 import os
 import datetime
 from dotenv import load_dotenv
-from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO
+from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
@@ -58,6 +58,26 @@ async def add_db_data(schedule_data: AddScheduleDTO):
 # 메인페이지 한 줄 추천 기능에 사용하는 함수
 # 유저의 id, 해당 날짜로 필터링
 async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
+    member = user_data.member_id
+    schedule_datetime_start = user_data.schedule_datetime_start
+    schedule_datetime_end = user_data.schedule_datetime_end
+    schedule_date = schedule_datetime_start.split("T")[0]
+    persona = user_data.user_persona or "hard working"
+    results = schedules.query(
+        query_texts=[persona],
+        n_results=5,
+        where={"$and":
+               [
+                   {"member": {"$eq": int(member)}},
+                   {"date": {"$eq": schedule_date}}
+               ]
+        }
+        # where_document={"$contains":"search_string"}  # optional filter
+    )
+    return results['documents']
+
+# 태그 생성용 스케쥴 반환 - 카테고리에 따라
+async def db_monthly_tag_schedule(user_data: ReportTagsRequestDTO):
     member = user_data.member_id
     schedule_datetime_start = user_data.schedule_datetime_start
     schedule_datetime_end = user_data.schedule_datetime_end
