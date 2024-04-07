@@ -57,7 +57,7 @@ async def add_db_data(schedule_data: AddScheduleDTO):
 
 # 메인페이지 한 줄 추천 기능에 사용하는 함수
 # 유저의 id, 해당 날짜로 필터링
-async def db_recommendation_main(user_data: RecommendationMainRequestDTO):
+async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
     member = user_data.member_id
     schedule_datetime_start = user_data.schedule_datetime_start
     schedule_datetime_end = user_data.schedule_datetime_end
