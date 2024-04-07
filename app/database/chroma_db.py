@@ -101,12 +101,13 @@ async def db_monthly_tag_schedule(user_data: ReportTagsRequestDTO):
                [
                    {"member": {"$eq": int(member)}},
                    {"year": {"$eq": year}},
-                   {"$or":
-                    [{"$and":
-                          [{"month": {"$eq": month-1}}, {"date": {"$gte": 10}}]},
-                     {"$and":
-                          [{"month": {"$eq": month}}, {"date": {"$lt": 10}}]}
-                    ]}
+                   {"month": {"$eq": month - 1}}
+                   # {"$or":
+                   #  [{"$and":
+                   #        [{"month": {"$eq": month-1}}, {"date": {"$gte": 10}}]},
+                   #   {"$and":
+                   #        [{"month": {"$eq": month}}, {"date": {"$lt": 10}}]}
+                   #  ]}
                ]
         }
         # where_document={"$contains":"search_string"}  # optional filter
