@@ -11,3 +11,9 @@ class AddScheduleDTO(BaseModel):
     location: str
     person: str
 
+class RecommendationMainRequestDTO(BaseModel):
+    member_id: int
+    user_persona: str
+    schedule_datetime_start: str
+    schedule_datetime_end: str
+

@@ -10,7 +10,7 @@ from fastapi import Depends
 import os
 import datetime
 from dotenv import load_dotenv
-from app.dto.db_dto import AddScheduleDTO
+from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
@@ -34,25 +34,47 @@ schedules = chroma_client.get_or_create_collection(
 def check_db_heartbeat():
     chroma_client.heartbeat()
 
-# description: DB에서 검색하는 함수
+# description: DB에서 검색하는 함수 - chat case 3에 사용
 async def search_db_query(query):
     # 컬렉션 생성
     # 컬렉션에 쿼리 전송
     result = schedules.query(
         query_texts=query,
-        n_results=2  # 결과에서 한 가지 문서만 반환하면 한강공원이, 두 가지 문서 반환하면 AI가 뜸->유사도가 이상하게 검사되는 것 같음
+        n_results=5  # 결과에서 한 가지 문서만 반환하면 한강공원이, 두 가지 문서 반환하면 AI가 뜸->유사도가 이상하게 검사되는 것 같음
     )
     return result
 
 # description: DB에 저장하는 함수
 # 스프링 백엔드로부터 chroma DB에 저장할 데이터를 받아 DB에 추가한다.
 async def add_db_data(schedule_data: AddScheduleDTO):
+    schedule_date = schedule_data.schedule_datetime_start.split("T")[0]
     schedules.add(
         documents=[schedule_data.data],
         ids=[str(schedule_data.schedule_id)],
-        metadatas=[{"datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
+        metadatas=[{"date": schedule_date, "datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
     )
     return True
+
+# 메인페이지 한 줄 추천 기능에 사용하는 함수
+# 유저의 id, 해당 날짜로 필터링
+async def db_recommendation_main(user_data: RecommendationMainRequestDTO):
+    member = user_data.member_id
+    schedule_datetime_start = user_data.schedule_datetime_start
+    schedule_datetime_end = user_data.schedule_datetime_end
+    schedule_date = schedule_datetime_start.split("T")[0]
+    persona = user_data.user_persona or "hard working"
+    results = schedules.query(
+        query_texts=[persona],
+        n_results=5,
+        where={"$and":
+               [
+                   {"member": {"$eq": int(member)}},
+                   {"date": {"$eq": schedule_date}}
+               ]
+        }
+        # where_document={"$contains":"search_string"}  # optional filter
+    )
+    return results['documents']
 
 def get_chroma_client():
     return chroma_client
