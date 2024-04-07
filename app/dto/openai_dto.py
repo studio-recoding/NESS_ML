@@ -6,3 +6,7 @@ class PromptRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     ness: str
+
+class ChatCaseResponse(BaseModel):
+    ness: str
+    case: int

@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, status
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
-from app.dto.openai_dto import PromptRequest, ChatResponse
+from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
 from app.prompt import openai_prompt
 
 import app.database.chroma_db as vectordb
@@ -26,8 +26,8 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-@router.post("/case", status_code=status.HTTP_200_OK, response_model=ChatResponse)
-async def get_langchain_case(data: PromptRequest) -> ChatResponse:
+@router.post("/case", status_code=status.HTTP_200_OK, response_model=ChatCaseResponse)
+async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     # description: use langchain
 
     config_normal = config['NESS_NORMAL']
@@ -48,23 +48,25 @@ async def get_langchain_case(data: PromptRequest) -> ChatResponse:
     print(case)
     case = int(case)
     if case == 1:
-        return await get_langchain_normal(data)
+        response = await get_langchain_normal(data)
 
     elif case == 2:
-        return await get_langchain_schedule(data)
+        response = await get_langchain_schedule(data)
 
     elif case == 3:
-        return await get_langchain_rag(data)
+        response = await get_langchain_rag(data)
 
     else:
         print("wrong case classification")
         # 적절한 HTTP 상태 코드와 함께 오류 메시지를 반환하거나, 다른 처리를 할 수 있습니다.
         raise HTTPException(status_code=400, detail="Wrong case classification")
 
+    return ChatCaseResponse(ness=response, case=case)
+
 
 # case 1 : normal
 #@router.post("/case/normal") # 테스트용 엔드포인트
-async def get_langchain_normal(data: PromptRequest) -> ChatResponse: # case 1 : normal
+async def get_langchain_normal(data: PromptRequest): # case 1 : normal
     print("running case 1")
     # description: use langchain
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -82,11 +84,11 @@ async def get_langchain_normal(data: PromptRequest) -> ChatResponse: # case 1 : 
     prompt = PromptTemplate.from_template(my_template)
     response = chat_model.predict(prompt.format(output_language="Korean", question=question))
     print(response)
-    return ChatResponse(ness=response)
+    return response
 
 # case 2 : 일정 생성
 #@router.post("/case/make_schedule") # 테스트용 엔드포인트
-async def get_langchain_schedule(data: PromptRequest) -> ChatResponse:
+async def get_langchain_schedule(data: PromptRequest):
     print("running case 2")
     # description: use langchain
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -100,11 +102,11 @@ async def get_langchain_schedule(data: PromptRequest) -> ChatResponse:
     prompt = PromptTemplate.from_template(case2_template)
     response = chat_model.predict(prompt.format(output_language="Korean", question=question))
     print(response)
-    return ChatResponse(ness=response)
+    return response
 
 # case 3 : rag
 #@router.post("/case/rag") # 테스트용 엔드포인트
-async def get_langchain_rag(data: PromptRequest) -> ChatResponse:
+async def get_langchain_rag(data: PromptRequest):
     print("running case 3")
     # description: use langchain
     chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
@@ -123,4 +125,4 @@ async def get_langchain_rag(data: PromptRequest) -> ChatResponse:
     prompt = PromptTemplate.from_template(case3_template)
     response = chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
     print(response)
-    return ChatResponse(ness=response)
+    return response
