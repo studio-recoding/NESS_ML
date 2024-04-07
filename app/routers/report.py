@@ -6,14 +6,14 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
-from app.dto.db_dto import RecommendationMainRequestDTO
+from app.dto.db_dto import ReportMemoryEmojiRequestDTO
 from app.dto.openai_dto import ChatResponse
-from app.prompt import openai_prompt
+from app.prompt import report_prompt
 import app.database.chroma_db as vectordb
 
 router = APIRouter(
-    prefix="/recommendation",
-    tags=["recommendation"]
+    prefix="/report",
+    tags=["report"]
 )
 
 # description: load env variables from .env file
@@ -25,15 +25,15 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-@router.post("/main", status_code=status.HTTP_200_OK)
-async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatResponse:
+@router.post("/memory_emoji", status_code=status.HTTP_200_OK)
+async def get_memory_emoji(user_data: ReportMemoryEmojiRequestDTO) -> ChatResponse:
     try:
         # 모델
-        config_recommendation = config['NESS_RECOMMENDATION']
+        config_report_emoji = config['NESS_RECOMMENDATION']
 
-        chat_model = ChatOpenAI(temperature=config_recommendation['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
-                                max_tokens=config_recommendation['MAX_TOKENS'],  # 최대 토큰수
-                                model_name=config_recommendation['MODEL_NAME'],  # 모델명
+        chat_model = ChatOpenAI(temperature=config_report_emoji['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                                max_tokens=config_report_emoji['MAX_TOKENS'],  # 최대 토큰수
+                                model_name=config_report_emoji['MODEL_NAME'],  # 모델명
                                 openai_api_key=OPENAI_API_KEY  # API 키
                                 )
 
@@ -43,12 +43,13 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatRes
         print(schedule)
 
         # 템플릿
-        recommendation_template = openai_prompt.Template.recommendation_template
+        memory_emoji_template = report_prompt.Template.memory_emoji_template
 
-        prompt = PromptTemplate.from_template(recommendation_template)
+        prompt = PromptTemplate.from_template(memory_emoji_template)
         result = chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
         print(result)
         return ChatResponse(ness=result)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

@@ -17,3 +17,8 @@ class RecommendationMainRequestDTO(BaseModel):
     schedule_datetime_start: str
     schedule_datetime_end: str
 
+class ReportMemoryEmojiRequestDTO(BaseModel):
+    member_id: int
+    user_persona: str
+    schedule_datetime_start: str
+    schedule_datetime_end: str
