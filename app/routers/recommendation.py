@@ -29,9 +29,11 @@ config.read(CONFIG_FILE_PATH)
 async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatResponse:
     try:
         # 모델
-        chat_model = ChatOpenAI(temperature=0.5,  # 창의성 (0.0 ~ 2.0)
-                                max_tokens=2048,  # 최대 토큰수
-                                model_name='gpt-3.5-turbo-1106',  # 모델명
+        config_recommendation = config['NESS_RECOMMENDATION']
+
+        chat_model = ChatOpenAI(temperature=config_recommendation['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                                max_tokens=config_recommendation['MAX_TOKENS'],  # 최대 토큰수
+                                model_name=config_recommendation['MODEL_NAME'],  # 모델명
                                 openai_api_key=OPENAI_API_KEY  # API 키
                                 )
 

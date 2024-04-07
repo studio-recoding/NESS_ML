@@ -30,11 +30,11 @@ config.read(CONFIG_FILE_PATH)
 async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     # description: use langchain
 
-    config_normal = config['NESS_NORMAL']
+    config_chat = config['NESS_CHAT']
 
-    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
-                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
-                            model_name=config_normal['MODEL_NAME'],  # 모델명
+    chat_model = ChatOpenAI(temperature=config_chat['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=config_chat['MAX_TOKENS'],  # 최대 토큰수
+                            model_name=config_chat['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
@@ -69,9 +69,11 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
 async def get_langchain_normal(data: PromptRequest): # case 1 : normal
     print("running case 1")
     # description: use langchain
-    chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
-                            max_tokens=2048,  # 최대 토큰수
-                            model_name='gpt-3.5-turbo-1106',  # 모델명
+    config_normal = config['NESS_NORMAL']
+
+    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
+                            model_name=config_normal['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
@@ -91,9 +93,11 @@ async def get_langchain_normal(data: PromptRequest): # case 1 : normal
 async def get_langchain_schedule(data: PromptRequest):
     print("running case 2")
     # description: use langchain
-    chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
-                            max_tokens=2048,  # 최대 토큰수
-                            model_name='gpt-3.5-turbo-1106',  # 모델명
+    config_normal = config['NESS_NORMAL']
+
+    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
+                            model_name=config_normal['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
@@ -109,9 +113,11 @@ async def get_langchain_schedule(data: PromptRequest):
 async def get_langchain_rag(data: PromptRequest):
     print("running case 3")
     # description: use langchain
-    chat_model = ChatOpenAI(temperature=0,  # 창의성 (0.0 ~ 2.0)
-                            max_tokens=2048,  # 최대 토큰수
-                            model_name='gpt-3.5-turbo-1106',  # 모델명
+    config_normal = config['NESS_NORMAL']
+
+    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
+                            model_name=config_normal['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
