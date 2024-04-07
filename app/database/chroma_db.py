@@ -62,8 +62,9 @@ async def db_recommendation_main(user_data: RecommendationMainRequestDTO):
     schedule_datetime_start = user_data.schedule_datetime_start
     schedule_datetime_end = user_data.schedule_datetime_end
     schedule_date = schedule_datetime_start.split("T")[0]
+    persona = user_data.user_persona or "hard working"
     results = schedules.query(
-        query_texts=["hard working"],
+        query_texts=[persona],
         n_results=5,
         where={"$and":
                [
