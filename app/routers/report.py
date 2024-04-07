@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
-from app.dto.db_dto import ReportMemoryEmojiRequestDTO
-from app.dto.openai_dto import ChatResponse
+from app.dto.db_dto import ReportMemoryEmojiRequestDTO, ReportTagsRequestDTO
+from app.dto.openai_dto import ChatResponse, TagsResponse
 from app.prompt import report_prompt
 import app.database.chroma_db as vectordb
 
@@ -53,3 +53,33 @@ async def get_memory_emoji(user_data: ReportMemoryEmojiRequestDTO) -> ChatRespon
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/tags", status_code=status.HTTP_200_OK)
+async def get_tags(user_data: ReportTagsRequestDTO) -> TagsResponse:
+    try:
+        # 모델
+        config_tags = config['NESS_TAGS']
+
+        chat_model = ChatOpenAI(temperature=config_tags['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                                max_tokens=config_tags['MAX_TOKENS'],  # 최대 토큰수
+                                model_name=config_tags['MODEL_NAME'],  # 모델명
+                                openai_api_key=OPENAI_API_KEY  # API 키
+                                )
+
+        # vectordb에서 유저의 정보를 가져온다.
+        schedule = await vectordb.db_monthly_tag_schedule(user_data)
+
+        print(schedule)
+
+        # 템플릿
+        report_tags_template = report_prompt.Template.report_tags_template
+
+        prompt = PromptTemplate.from_template(report_tags_template)
+        result = chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
+        print(result)
+        tags = result.split("\"")[1].split(",")
+        tags = [tag.strip() for tag in tags]
+        print(tags)
+        return TagsResponse(tags=tags)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

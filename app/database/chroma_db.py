@@ -10,7 +10,7 @@ from fastapi import Depends
 import os
 import datetime
 from dotenv import load_dotenv
-from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO
+from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
@@ -48,10 +48,13 @@ async def search_db_query(query):
 # 스프링 백엔드로부터 chroma DB에 저장할 데이터를 받아 DB에 추가한다.
 async def add_db_data(schedule_data: AddScheduleDTO):
     schedule_date = schedule_data.schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    date = int(schedule_date.split("-")[2])
     schedules.add(
         documents=[schedule_data.data],
         ids=[str(schedule_data.schedule_id)],
-        metadatas=[{"date": schedule_date, "datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
+        metadatas=[{"year": year, "month": month, "date": date, "datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
     )
     return True
 
@@ -62,6 +65,9 @@ async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
     schedule_datetime_start = user_data.schedule_datetime_start
     schedule_datetime_end = user_data.schedule_datetime_end
     schedule_date = schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    date = int(schedule_date.split("-")[2])
     persona = user_data.user_persona or "hard working"
     results = schedules.query(
         query_texts=[persona],
@@ -69,7 +75,38 @@ async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
         where={"$and":
                [
                    {"member": {"$eq": int(member)}},
-                   {"date": {"$eq": schedule_date}}
+                   {"year": {"$eq": year}},
+                   {"month": {"$eq": month}},
+                   {"date": {"$eq": date}}
+               ]
+        }
+        # where_document={"$contains":"search_string"}  # optional filter
+    )
+    return results['documents']
+
+# 태그 생성용 스케쥴 반환 - 카테고리에 따라
+async def db_monthly_tag_schedule(user_data: ReportTagsRequestDTO):
+    member = user_data.member_id
+    schedule_datetime_start = user_data.schedule_datetime_start
+    schedule_datetime_end = user_data.schedule_datetime_end
+    schedule_date = schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    date = int(schedule_date.split("-")[2])
+    persona = user_data.user_persona or "hard working"
+    results = schedules.query(
+        query_texts=[persona],
+        n_results=15,
+        where={"$and":
+               [
+                   {"member": {"$eq": int(member)}},
+                   {"year": {"$eq": year}},
+                   {"$or":
+                    [{"$and":
+                          [{"month": {"$eq": month-1}}, {"date": {"$gte": 10}}]},
+                     {"$and":
+                          [{"month": {"$eq": month}}, {"date": {"$lt": 10}}]}
+                    ]}
                ]
         }
         # where_document={"$contains":"search_string"}  # optional filter

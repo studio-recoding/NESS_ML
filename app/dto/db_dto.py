@@ -22,3 +22,10 @@ class ReportMemoryEmojiRequestDTO(BaseModel):
     user_persona: str
     schedule_datetime_start: str
     schedule_datetime_end: str
+
+class ReportTagsRequestDTO(BaseModel):
+    member_id: int
+    user_persona: str
+    schedule_datetime_start: str
+    schedule_datetime_end: str
+
