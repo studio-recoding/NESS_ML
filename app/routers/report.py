@@ -7,7 +7,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
 from app.dto.db_dto import ReportMemoryEmojiRequestDTO, ReportTagsRequestDTO
-from app.dto.openai_dto import ChatResponse, TagsResponse
+from app.dto.openai_dto import ChatResponse, TagsResponse, TagDescription
 from app.prompt import report_prompt
 import app.database.chroma_db as vectordb
 
@@ -76,10 +76,17 @@ async def get_tags(user_data: ReportTagsRequestDTO) -> TagsResponse:
         prompt = PromptTemplate.from_template(report_tags_template)
         result = chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
         print(result)
-        tags = result.split("\"")[1].split(",")
-        tags = [tag.strip() for tag in tags]
-        print(tags)
-        return TagsResponse(tags=tags)
+        
+        # 문자열 파싱해서 dto로 매핑
+        tag_entries = result.split("\"")[1].split(", ")
+        tags = []
+
+        for entry in tag_entries:
+            # ':'를 기준으로 태그와 설명을 분리
+            tag, desc = entry.split(": ")
+            tags.append(TagDescription(tag=tag.strip(), desc=desc.strip()))
+
+        return TagsResponse(tagList=tags)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
