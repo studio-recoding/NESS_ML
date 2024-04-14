@@ -79,6 +79,8 @@ class Template:
         }}
 
         User input: {question}
+        
+        Response to user:
         """
     case3_template = """
     

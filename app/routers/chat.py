@@ -30,7 +30,7 @@ config.read(CONFIG_FILE_PATH)
 async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     # description: use langchain
 
-    config_chat = config['NESS_CHAT']
+    config_chat = config['NESS_CASE']
 
     chat_model = ChatOpenAI(temperature=config_chat['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
                             max_tokens=config_chat['MAX_TOKENS'],  # 최대 토큰수
