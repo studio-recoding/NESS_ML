@@ -3,6 +3,7 @@ from typing import List
 
 class PromptRequest(BaseModel):
     prompt: str
+    persona: str
 
 class ChatResponse(BaseModel):
     ness: str
