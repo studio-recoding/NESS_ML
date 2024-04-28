@@ -16,7 +16,9 @@ load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
 
 # description: 원격 EC2 인스턴스에서 ChromaDB에 연결
-chroma_client = chromadb.HttpClient(host=CHROMA_DB_IP_ADDRESS, port=8000)
+# https://db.nessplanning.com
+chroma_client = chromadb.HttpClient(host='https://db.nessplanning.com', port=8000)
+# chroma_client = chromadb.HttpClient(host=CHROMA_DB_IP_ADDRESS, port=8000)
 
 # description: embedding funtion 설정
 # all-MiniLM-L6-v2 가 디폴트
