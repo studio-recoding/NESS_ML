@@ -38,7 +38,7 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatRes
                                 )
 
         # vectordb에서 유저의 정보를 가져온다.
-        schedule = await vectordb.db_recommendation_main(user_data)
+        schedule = await vectordb.db_daily_schedule(user_data)
 
         print(schedule)
 

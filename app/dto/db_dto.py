@@ -7,11 +7,23 @@ class AddScheduleDTO(BaseModel):
     schedule_datetime_end: str
     schedule_id: int
     member_id: int
-    category: str
+    category: int
     location: str
     person: str
 
 class RecommendationMainRequestDTO(BaseModel):
+    member_id: int
+    user_persona: str
+    schedule_datetime_start: str
+    schedule_datetime_end: str
+
+class ReportMemoryEmojiRequestDTO(BaseModel):
+    member_id: int
+    user_persona: str
+    schedule_datetime_start: str
+    schedule_datetime_end: str
+
+class ReportTagsRequestDTO(BaseModel):
     member_id: int
     user_persona: str
     schedule_datetime_start: str

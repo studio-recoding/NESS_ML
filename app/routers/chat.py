@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, status
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
+from datetime import datetime
 
 from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
 from app.prompt import openai_prompt
@@ -30,7 +31,7 @@ config.read(CONFIG_FILE_PATH)
 async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     # description: use langchain
 
-    config_chat = config['NESS_CHAT']
+    config_chat = config['NESS_CASE']
 
     chat_model = ChatOpenAI(temperature=config_chat['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
                             max_tokens=config_chat['MAX_TOKENS'],  # 최대 토큰수
@@ -57,9 +58,11 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
         response = await get_langchain_rag(data)
 
     else:
-        print("wrong case classification")
-        # 적절한 HTTP 상태 코드와 함께 오류 메시지를 반환하거나, 다른 처리를 할 수 있습니다.
-        raise HTTPException(status_code=400, detail="Wrong case classification")
+        # print("wrong case classification")
+        # # 적절한 HTTP 상태 코드와 함께 오류 메시지를 반환하거나, 다른 처리를 할 수 있습니다.
+        # raise HTTPException(status_code=400, detail="Wrong case classification")
+        response = "좀 더 명확한 요구가 필요해요. 다시 한 번 얘기해주실 수 있나요?"
+        case = "Exception"
 
     return ChatCaseResponse(ness=response, case=case)
 
@@ -104,7 +107,8 @@ async def get_langchain_schedule(data: PromptRequest):
     case2_template = openai_prompt.Template.case2_template
 
     prompt = PromptTemplate.from_template(case2_template)
-    response = chat_model.predict(prompt.format(output_language="Korean", question=question))
+    current_time = datetime.now()
+    response = chat_model.predict(prompt.format(output_language="Korean", question=question, current_time=current_time))
     print(response)
     return response
 

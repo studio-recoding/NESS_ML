@@ -32,6 +32,9 @@ app.include_router(chromadb.router)
 from app.routers import recommendation
 app.include_router(recommendation.router)
 
+from app.routers import report
+app.include_router(report.router)
+
 # description: prevent CORS error
 origins = [
     "*",
