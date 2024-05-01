@@ -8,7 +8,7 @@ from langchain_core.prompts import PromptTemplate
 
 from app.dto.db_dto import RecommendationMainRequestDTO
 from app.dto.openai_dto import ChatResponse
-from app.prompt import openai_prompt
+from app.prompt import openai_prompt, persona_prompt
 import app.database.chroma_db as vectordb
 
 router = APIRouter(
@@ -44,9 +44,11 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatRes
 
         # 템플릿
         recommendation_template = openai_prompt.Template.recommendation_template
+        persona = user_data.user_persona
+        user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
         prompt = PromptTemplate.from_template(recommendation_template)
-        result = chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
+        result = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
         print(result)
         return ChatResponse(ness=result)
 
