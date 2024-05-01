@@ -70,10 +70,10 @@ class Template:
 
             Example for one-shot learning:
 
-            User input: "I have a meeting with Dr. Smith at her office on March 3rd at 10am."
+            User input: I have a meeting with Dr. Smith at her office on March 3rd at 10am.
 
             Response to user:
-            "I've added your meeting with Dr. Smith at her office on March 3rd at 10am to your schedule. Is there anything else you'd like to add or modify?"
+            I've added your meeting with Dr. Smith at her office on March 3rd at 10am to your schedule. Is there anything else you'd like to add or modify?
             <separate>
             {{
                 "info": "meeting with Dr. Smith",
