@@ -35,6 +35,9 @@ app.include_router(recommendation.router)
 from app.routers import report
 app.include_router(report.router)
 
+from app.routers import email
+app.include_router(email.router)
+
 # description: prevent CORS error
 origins = [
     "*",

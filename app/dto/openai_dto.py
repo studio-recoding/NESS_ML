@@ -18,3 +18,7 @@ class TagDescription(BaseModel):
 
 class TagsResponse(BaseModel):
     tagList: List[TagDescription]
+
+class EmailResponse(BaseModel):
+    text: str
+    image: str
