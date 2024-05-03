@@ -1,33 +1,34 @@
 class Template:
     daily_email_template = """
                     Construct an email to conclude the user's day. The email should:
-                    
+
                     Acknowledge the user's efforts and achievements throughout the day.
                     Express gratitude for their hard work.
                     Offer encouragement and suggestions for preparing for tomorrow’s agenda.
                     Use this information to create a personalized, thoughtful email that reinforces positive feedback and provides motivational insights for the upcoming day.
+                    You should construct the email based solely on the schedule provided below, without assuming or extrapolating additional details.
                     YOU MUST USE {output_language} TO RESPOND.
-                    
-                    Today's schedule for the user:
-                    2021-07-19T09:00:00: 줌 회의 참석
-                    2021-07-19T11:00:00: 프로젝트 보고서 검토
-                    2021-07-19T13:00:00: 비즈니스 점심 식사
-                    2021-07-19T15:00:00: 팀 미팅
-                    2021-07-19T18:00:00: 워크샵 준비
-                    
-                    Email:
-                    오늘 하루 동안의 일정을 보면 많은 일을 처리하신 것으로 보입니다.
 
-                    오전에는 중요한 줌 회의에 참석하셨습니다. 회의에 적극적으로 참여하신 점이 인상적이었습니다.
-                    프로젝트 보고서를 검토하는 시간에는 세부 사항에 주의를 기울이셨습니다. 이런 세심함이 프로젝트의 성공에 크게 기여할 것입니다.
-                    비즈니스 점심 식사는 관계 구축에 있어 중요한 시간이었습니다. 이러한 네트워킹은 앞으로의 업무에도 도움이 될 것입니다.
-                    오후의 팀 미팅에서는 팀원들과의 소통을 잘 이끌어 나가셨습니다. 팀의 협력을 증진시키는 데 중요한 역할을 하셨어요.
-                    마지막으로, 워크샵 준비에도 힘써 주셔서 감사합니다. 이런 준비가 내일의 워크샵을 원활하게 진행될 수 있게 할 것입니다.
-                    
-                    하루 동안의 노력에 감사드립니다. 휴식을 취하며 내일을 위한 에너지를 충전하시길 바랍니다. 내일도 좋은 하루 되세요!
-                    
+                    Today's schedule for the user:
+                    2021-07-19T09:00:00: Zoom meeting attendance
+                    2021-07-19T11:00:00: Review of project report
+                    2021-07-19T13:00:00: Business lunch
+                    2021-07-19T15:00:00: Team meeting
+                    2021-07-19T18:00:00: Workshop preparation
+
+                    Email:
+                    Today's activities show you managed a full and productive schedule.
+
+                    In the morning, your active participation in the Zoom meeting was impressive. Such engagement is crucial for fostering collaborative success.
+                    During your project report review, your attention to detail stood out. This meticulousness will significantly contribute to the project's success.
+                    The business lunch was an important time for building relationships. Such networking will assist in future tasks.
+                    In the afternoon, you effectively led the team meeting, playing a vital role in enhancing team cooperation.
+                    Lastly, thank you for your effort in preparing for the workshop. This preparation will facilitate a smooth running of tomorrow's session.
+
+                    Thank you for your hard work today. Rest well and recharge for another fruitful day tomorrow.
+
                     Today's schedule for the user:
                     {schedule} 
-                    
+
                     Email:
                     """
