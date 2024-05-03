@@ -46,14 +46,18 @@ async def get_daily_email(user_data: EmailRequestDTO) -> EmailResponse:
         # 템플릿
         email_template = email_prompt.Template.daily_email_template
         
-        # 페르소나 추후 사용 가능
-        # persona = user_data.user_persona
-        # user_persona_prompt = persona_prompt.Template.from_persona(persona)
+        # 페르소나
+        persona = user_data.user_persona
+        user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
         # 이메일 내용
         prompt = PromptTemplate.from_template(email_template)
         email_text = chat_model.predict(
-            prompt.format(output_language="Korean", schedule=schedule))
+            prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
+        print(email_text)
+
+        # \n을 <br>로 변환
+        email_text = email_text.replace("\n", "<br>")
         print(email_text)
 
         # 이메일에 들어갈 텍스트

@@ -1,15 +1,15 @@
 class Template:
     daily_email_template = """
+                    {persona}
                     Construct an email to conclude the user's day. The email should:
 
                     Acknowledge the user's efforts and achievements throughout the day.
-                    Express gratitude for their hard work.
                     Offer encouragement and suggestions for preparing for tomorrow’s agenda.
                     Use this information to create a personalized, thoughtful email that reinforces positive feedback and provides motivational insights for the upcoming day.
-                    You should construct the email based solely on the schedule provided below, without assuming or extrapolating additional details.
-                    YOU MUST USE {output_language} TO RESPOND.
+                    You should construct the email based solely on the schedule provided, without assuming or extrapolating additional details.
+                    YOU MUST USE {output_language} TO RESPOND. The length of the email should not exceed 2 paragraphs. Do not call user's name.
 
-                    Today's schedule for the user:
+                    Today's schedule for the user1:
                     2021-07-19T09:00:00: Zoom meeting attendance
                     2021-07-19T11:00:00: Review of project report
                     2021-07-19T13:00:00: Business lunch
@@ -27,7 +27,7 @@ class Template:
 
                     Thank you for your hard work today. Rest well and recharge for another fruitful day tomorrow.
 
-                    Today's schedule for the user:
+                    Today's schedule for the user2:
                     {schedule} 
 
                     Email:

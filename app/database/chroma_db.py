@@ -71,9 +71,7 @@ async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
     month = int(schedule_date.split("-")[1])
     date = int(schedule_date.split("-")[2])
     persona = user_data.user_persona or "hard working"
-    results = schedules.query(
-        query_texts=[persona],
-        n_results=5,
+    results = schedules.get(
         where={"$and":
                [
                    {"member": {"$eq": int(member)}},
@@ -84,7 +82,14 @@ async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
         }
         # where_document={"$contains":"search_string"}  # optional filter
     )
-    return results['documents']
+
+    # documents와 datetime_start 추출
+    results = [(doc, meta['datetime_start']) for doc, meta in zip(results['documents'], results['metadatas'])]
+
+    # 결과 출력
+    print(results)
+
+    return results
 
 # 태그 생성용 스케쥴 반환 - 카테고리에 따라
 async def db_monthly_tag_schedule(user_data: ReportTagsRequestDTO):
