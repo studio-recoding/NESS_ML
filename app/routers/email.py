@@ -1,19 +1,20 @@
 import configparser
 import os
 
+from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, status, HTTPException
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
-from app.dto.db_dto import RecommendationMainRequestDTO
-from app.dto.openai_dto import ChatResponse
-from app.prompt import openai_prompt, persona_prompt
+from app.dto.db_dto import EmailRequestDTO
+from app.dto.openai_dto import EmailResponse
+from app.prompt import email_prompt, persona_prompt
 import app.database.chroma_db as vectordb
 
 router = APIRouter(
-    prefix="/recommendation",
-    tags=["recommendation"]
+    prefix="/email",
+    tags=["email"]
 )
 
 # description: load env variables from .env file
@@ -25,12 +26,12 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-# 유저의 하루 스케줄을 기반으로 한 줄 추천을 생성한다.
-@router.post("/main", status_code=status.HTTP_200_OK)
-async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatResponse:
+# description: 유저의 하루 스케줄을 기반으로 이메일 내용을 작성한다.
+@router.post("/daily", status_code=status.HTTP_200_OK)
+async def get_daily_email(user_data: EmailRequestDTO) -> EmailResponse:
     try:
         # 모델
-        config_recommendation = config['NESS_RECOMMENDATION']
+        config_recommendation = config['NESS_EMAIL']
 
         chat_model = ChatOpenAI(temperature=config_recommendation['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
                                 max_tokens=config_recommendation['MAX_TOKENS'],  # 최대 토큰수
@@ -44,14 +45,36 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> ChatRes
         print(schedule)
 
         # 템플릿
-        recommendation_template = openai_prompt.Template.recommendation_template
+        email_template = email_prompt.Template.daily_email_template
+        
+        # 페르소나
         persona = user_data.user_persona
         user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
-        prompt = PromptTemplate.from_template(recommendation_template)
-        result = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
-        print(result)
-        return ChatResponse(ness=result)
+        # 이메일 내용
+        prompt = PromptTemplate.from_template(email_template)
+        email_text = chat_model.predict(
+            prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
+        print(email_text)
+
+        # \n을 <br>로 변환
+        email_text = email_text.replace("\n", "<br>")
+        print(email_text)
+
+        # 이메일에 들어갈 텍스트
+        client = OpenAI()
+
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt="Relaxing image, Calm and Quiet illustration style",
+            size="1792x1024",
+            quality="standard",
+            n=1,
+        )
+
+        image_url = response.data[0].url
+
+        return EmailResponse(text=email_text, image=image_url)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
