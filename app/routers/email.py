@@ -1,6 +1,7 @@
 import configparser
 import os
 
+from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, status, HTTPException
 from langchain_community.chat_models import ChatOpenAI
@@ -61,7 +62,17 @@ async def get_daily_email(user_data: EmailRequestDTO) -> EmailResponse:
         print(email_text)
 
         # 이메일에 들어갈 텍스트
-        image_url = "달리를 이용하여 생성할 이미지의 링크"
+        client = OpenAI()
+
+        response = client.images.generate(
+            model="dall-e-3",
+            prompt="Relaxing image, Calm and Quiet illustration style",
+            size="1792x1024",
+            quality="standard",
+            n=1,
+        )
+
+        image_url = response.data[0].url
 
         return EmailResponse(text=email_text, image=image_url)
 
