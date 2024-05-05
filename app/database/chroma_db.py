@@ -16,7 +16,9 @@ load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
 
 # description: 원격 EC2 인스턴스에서 ChromaDB에 연결
-chroma_client = chromadb.HttpClient(host=CHROMA_DB_IP_ADDRESS, port=8000)
+# https://db.nessplanning.com
+chroma_client = chromadb.HttpClient(host='https://db.nessplanning.com', port=8000)
+# chroma_client = chromadb.HttpClient(host=CHROMA_DB_IP_ADDRESS, port=8000)
 
 # description: embedding funtion 설정
 # all-MiniLM-L6-v2 가 디폴트
@@ -69,15 +71,50 @@ async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
     month = int(schedule_date.split("-")[1])
     date = int(schedule_date.split("-")[2])
     persona = user_data.user_persona or "hard working"
-    results = schedules.query(
-        query_texts=[persona],
-        n_results=5,
+    results = schedules.get(
         where={"$and":
                [
                    {"member": {"$eq": int(member)}},
                    {"year": {"$eq": year}},
                    {"month": {"$eq": month}},
                    {"date": {"$eq": date}}
+               ]
+        }
+        # where_document={"$contains":"search_string"}  # optional filter
+    )
+
+    # documents와 datetime_start 추출
+    results = [(doc, meta['datetime_start']) for doc, meta in zip(results['documents'], results['metadatas'])]
+
+    # 결과 출력
+    print(results)
+
+    return results
+
+async def activity_recommendation_schedule(user_data: ReportTagsRequestDTO, ness: str):
+    member = user_data.member_id
+    schedule_datetime_start = user_data.schedule_datetime_start
+    schedule_datetime_end = user_data.schedule_datetime_end
+    schedule_date = schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    # date = int(schedule_date.split("-")[2])
+
+    ness = ness
+    results = schedules.query(
+        query_texts=[ness],
+        n_results=5,
+        where={"$and":
+               [
+                   {"member": {"$eq": int(member)}},
+                   {"year": {"$eq": year}},
+                   {"month": {"$eq": month}}
+                   # {"$or":
+                   #  [{"$and":
+                   #        [{"month": {"$eq": month-1}}, {"date": {"$gte": 10}}]},
+                   #   {"$and":
+                   #        [{"month": {"$eq": month}}, {"date": {"$lt": 10}}]}
+                   #  ]}
                ]
         }
         # where_document={"$contains":"search_string"}  # optional filter

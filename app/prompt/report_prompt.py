@@ -17,7 +17,9 @@ class Template:
         """
 
     report_tags_template = """
-            You are an AI assistant tasked with analyzing a user's schedule over the span of a month. From this detailed schedule, you will distill three keywords that best encapsulate the user's activities, interests, or achievements throughout the month. Additionally, you will provide a brief explanation for each keyword to illustrate why it was chosen, making the output more informative and engaging. Here are the rules for your analysis:
+            {persona}
+            You are an AI assistant tasked with analyzing a user's schedule over the span of a month.
+            From this detailed schedule, you will distill three keywords that best encapsulate the user's activities, interests, or achievements throughout the month. Additionally, you will provide a brief explanation for each keyword to illustrate why it was chosen, making the output more informative and engaging. Here are the rules for your analysis:
 
             YOU MUST USE {output_language} TO RESPOND TO THE INPUT.
             YOU MUST PROVIDE THREE KEYWORDS in your response, each accompanied by a concise explanation.

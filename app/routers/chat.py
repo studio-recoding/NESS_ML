@@ -9,7 +9,7 @@ from langchain_core.prompts import PromptTemplate
 from datetime import datetime
 
 from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
-from app.prompt import openai_prompt
+from app.prompt import openai_prompt, persona_prompt
 
 import app.database.chroma_db as vectordb
 
@@ -80,14 +80,14 @@ async def get_langchain_normal(data: PromptRequest): # case 1 : normal
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
-    # 기존 모델 문제 생김
-    # chat_model = LangchainOpenAI(openai_api_key=OPENAI_API_KEY)
+    persona = data.persona
+    user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
     # description: give NESS's ideal instruction as template
     my_template = openai_prompt.Template.case1_template
 
     prompt = PromptTemplate.from_template(my_template)
-    response = chat_model.predict(prompt.format(output_language="Korean", question=question))
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question))
     print(response)
     return response
 
@@ -104,11 +104,13 @@ async def get_langchain_schedule(data: PromptRequest):
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
+    persona = data.persona
+    user_persona_prompt = persona_prompt.Template.from_persona(persona)
     case2_template = openai_prompt.Template.case2_template
 
     prompt = PromptTemplate.from_template(case2_template)
     current_time = datetime.now()
-    response = chat_model.predict(prompt.format(output_language="Korean", question=question, current_time=current_time))
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time))
     print(response)
     return response
 
@@ -125,6 +127,8 @@ async def get_langchain_rag(data: PromptRequest):
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
     question = data.prompt
+    persona = data.persona
+    user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
     # vectordb.search_db_query를 비동기적으로 호출합니다.
     schedule = await vectordb.search_db_query(question)  # vector db에서 검색
@@ -133,6 +137,6 @@ async def get_langchain_rag(data: PromptRequest):
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    response = chat_model.predict(prompt.format(output_language="Korean", question=question, schedule=schedule))
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule))
     print(response)
     return response

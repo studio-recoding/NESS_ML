@@ -8,7 +8,7 @@ from langchain_core.prompts import PromptTemplate
 
 from app.dto.db_dto import ReportMemoryEmojiRequestDTO, ReportTagsRequestDTO
 from app.dto.openai_dto import ChatResponse, TagsResponse, TagDescription
-from app.prompt import report_prompt
+from app.prompt import report_prompt, persona_prompt
 import app.database.chroma_db as vectordb
 
 router = APIRouter(
@@ -72,9 +72,11 @@ async def get_tags(user_data: ReportTagsRequestDTO) -> TagsResponse:
 
         # 템플릿
         report_tags_template = report_prompt.Template.report_tags_template
+        persona = user_data.user_persona
+        user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
         prompt = PromptTemplate.from_template(report_tags_template)
-        result = chat_model.predict(prompt.format(output_language="Korean", schedule=schedule))
+        result = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
         print(result)
         
         # 문자열 파싱해서 dto로 매핑
