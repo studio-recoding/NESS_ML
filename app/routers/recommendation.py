@@ -8,7 +8,11 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
 from app.dto.db_dto import RecommendationMainRequestDTO
+<<<<<<< Updated upstream
 from app.dto.openai_dto import RecommendationResponse, ActivityDescription
+=======
+from app.dto.openai_dto import RecommendationResponse
+>>>>>>> Stashed changes
 from app.prompt import openai_prompt, persona_prompt
 import app.database.chroma_db as vectordb
 
@@ -26,7 +30,7 @@ CONFIG_FILE_PATH = "app/prompt/openai_config.ini"
 config = configparser.ConfigParser()
 config.read(CONFIG_FILE_PATH)
 
-# 유저의 하루 스케줄을 기반으로 한 줄 추천을 생성한다.
+# 유저의 하루 스케줄을 기반으로 한 줄 추천 & 추천 활동을 생성한다.
 @router.post("/main", status_code=status.HTTP_200_OK)
 async def get_recommendation(user_data: RecommendationMainRequestDTO) -> RecommendationResponse:
     try:
@@ -50,6 +54,7 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
         prompt = PromptTemplate.from_template(recommendation_template)
+<<<<<<< Updated upstream
         ness = chat_model.predict(prompt.format(persona=user_persona_prompt,
                                                 output_language="Korean",
                                                 schedule=day_schedule
@@ -82,6 +87,12 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         response = RecommendationResponse(ness=ness, activityList=activity_list)
 
         return response
+=======
+        ness = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
+        print(ness)
+
+        return RecommendationResponse(ness=ness)
+>>>>>>> Stashed changes
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
