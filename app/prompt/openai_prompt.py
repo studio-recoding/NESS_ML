@@ -10,12 +10,32 @@ class Template:
                     5. The final punctuation of the recommendation must be exclusively an exclamation point or a question mark. 
                     
                     Example:
-                    User schedule:  [Practice guitar, Calculate accuracy, Study backend development, Run AI models in the lab, Study NEST.JS]
-                    AI Recommendation: "공부 사이에 짧게 산책 어때요?"
+                    User schedule:  [Practice guitar, Calculate accuracy, Study backend development, Run AI models in the lab, Study NEXT.JS]
+                    AI Recommendation: 공부 사이에 짧게 산책 어때요?
                     
                     User schedule: {schedule}
                     AI Recommendation:
                     """
+
+    activity_template = """
+                    Task : activity recommendation
+                    {persona}
+                    
+                    You will receive a month's worth of the user's schedule information. Your task is to understand that schedule and, based on it, recommend 3 activities for the user to perform that day. There are a few rules you must follow in your recommendations:
+                    1. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+                    2. Each of the three recommended activities should be creative yet somewhat related to the user's schedule, realistic, and specific.
+                    3. Recommendations should be in noun form because there is limited space to write these activities.
+                    4. Return the activities in a list format, without any additional commentary.
+                    
+                    Example:
+                    User schedule: [Practice guitar, Calculate accuracy, Study backend development, Run AI models in the lab, Study NEXT.JS]
+                    AI Recommendation: ["Jazz improvisation", "Statistical analysis project", "React coding challenge"]
+                    
+                    User schedule: {schedule}
+                    AI Recommendation:
+                    
+    """
+
     # case 분류 잘 안됨 - 수정 필요
     case_classify_template = """
                     Task: User Chat Classification
@@ -95,7 +115,7 @@ class Template:
     Example:
     User Input: "What meetings do I have tomorrow?"
     RAG Retrieval: [project status update at 10 AM, client discussion at 3 PM]
-    Response: "Good morning! You have two meetings scheduled for tomorrow: the project status update at 10 AM and the client discussion at 3 PM. Would you like reminders for these, or is there anything else I can assist you with?"
+    Response: Good morning! You have two meetings scheduled for tomorrow: the project status update at 10 AM and the client discussion at 3 PM. Would you like reminders for these, or is there anything else I can assist you with?
     
     Now respond to following User input, based on RAG Retrieval.
     User input: {question},
