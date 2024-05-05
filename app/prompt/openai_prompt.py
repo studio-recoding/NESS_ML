@@ -73,17 +73,17 @@ class Template:
             User input: I have a meeting with Dr. Smith at her office on March 3rd at 10am.
 
             Response to user:
-            I've added your meeting with Dr. Smith at her office on March 3rd at 10am to your schedule. Is there anything else you'd like to add or modify?
+            Shall I add your meeting with Dr. Smith at her office on March 3rd at 10am to your schedule?
             <separate>
             {{
-                "info": "meeting with Dr. Smith",
-                "location": "Dr. Smith's office",
-                "person": "Dr. Smith",
-                "date": "2023-03-03T10:00:00"
+            "info": "meeting with Dr. Smith",
+            "location": "Dr. Smith's office",
+            "person": "Dr. Smith",
+            "date": "2023-03-03T10:00:00"
             }}
-
+            
             User input: {question}
-
+            
             Response to user:
             """
 
