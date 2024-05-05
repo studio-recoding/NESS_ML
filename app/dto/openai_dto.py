@@ -22,3 +22,11 @@ class TagsResponse(BaseModel):
 class EmailResponse(BaseModel):
     text: str
     image: str
+
+class ActivityDescription(BaseModel):
+    activity: str
+    imageTag: str
+
+class RecommendationResponse(BaseModel):
+    ness: str
+    activityList: List[ActivityDescription]
