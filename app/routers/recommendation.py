@@ -1,5 +1,6 @@
 import configparser
 import os
+import json
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -7,7 +8,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
 from app.dto.db_dto import RecommendationMainRequestDTO
-from app.dto.openai_dto import RecommendationResponse
+from app.dto.openai_dto import RecommendationResponse, ActivityDescription
 from app.prompt import openai_prompt, persona_prompt
 import app.database.chroma_db as vectordb
 
@@ -57,14 +58,30 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
 
         # 한 줄 추천 기반 활동 추천하기
         month_schedule = await vectordb.activity_recommendation_schedule(user_data, ness)
+        print(month_schedule)
+
         activity_template = openai_prompt.Template.activity_template
         activity_prompt = PromptTemplate.from_template(activity_template)
-        activity_response = chat_model.predict(activity_prompt.format(output_language="Korean",
-                                                             schedule=month_schedule
-                                                             ))
-        # 활동 응답 파싱
+        activity_response = chat_model.predict(activity_prompt.format(persona=user_persona_prompt,
+                                                                      output_language="Korean",
+                                                                      schedule=month_schedule
+                                                                      ))
+        print(activity_response)
 
-        return RecommendationResponse(ness=ness)
+        try:
+            activities = json.loads(activity_response)
+        except json.JSONDecodeError:
+            print("Error parsing the JSON response")
+            activities = []
+
+        # Generate ActivityDescription objects
+        activity_list = [ActivityDescription(activity=act, imageTag=act.replace(" ", "_").lower() + "_img") for act in
+                         activities]
+
+        # Create the RecommendationResponse object
+        response = RecommendationResponse(ness=ness, activityList=activity_list)
+
+        return response
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

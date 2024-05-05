@@ -91,6 +91,36 @@ async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
 
     return results
 
+async def activity_recommendation_schedule(user_data: ReportTagsRequestDTO, ness: str):
+    member = user_data.member_id
+    schedule_datetime_start = user_data.schedule_datetime_start
+    schedule_datetime_end = user_data.schedule_datetime_end
+    schedule_date = schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    # date = int(schedule_date.split("-")[2])
+
+    ness = ness
+    results = schedules.query(
+        query_texts=[ness],
+        n_results=5,
+        where={"$and":
+               [
+                   {"member": {"$eq": int(member)}},
+                   {"year": {"$eq": year}},
+                   {"month": {"$eq": month}}
+                   # {"$or":
+                   #  [{"$and":
+                   #        [{"month": {"$eq": month-1}}, {"date": {"$gte": 10}}]},
+                   #   {"$and":
+                   #        [{"month": {"$eq": month}}, {"date": {"$lt": 10}}]}
+                   #  ]}
+               ]
+        }
+        # where_document={"$contains":"search_string"}  # optional filter
+    )
+    return results['documents']
+
 # 태그 생성용 스케쥴 반환 - 카테고리에 따라
 async def db_monthly_tag_schedule(user_data: ReportTagsRequestDTO):
     member = user_data.member_id
