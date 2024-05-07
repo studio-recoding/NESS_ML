@@ -23,7 +23,6 @@ class EmailResponse(BaseModel):
     text: str
     image: str
 
-<<<<<<< Updated upstream
 class ActivityDescription(BaseModel):
     activity: str
     imageTag: str
@@ -31,11 +30,4 @@ class ActivityDescription(BaseModel):
 class RecommendationResponse(BaseModel):
     ness: str
     activityList: List[ActivityDescription]
-=======
-class ActivityInfo(BaseModel):
-    activity: str
-    imageTag: str
-class RecommendationResponse(BaseModel):
-    ness: str
-    activityList: List[ActivityInfo]
->>>>>>> Stashed changes
+

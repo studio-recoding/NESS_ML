@@ -84,7 +84,7 @@ class Template:
             2. Organize the event the user wants to add into a json format for saving in a database. The returned json will have keys for info, location, person, and date.
             - info: Summarizes what the user wants to do. This value must always be present.
             - location: If the user's event information includes a place, save that place as the value.
-            - person: If the user's event mentions a person they want to include, save that person as the value.
+            - person: If th e user's event mentions a person they want to include, save that person as the value.
             - date: If the user's event information includes a specific date and time, save that date and time in datetime format. Dates should be organized based on the current time at the user's location. Current time is {current_time}.
             Separate the outputs for tasks 1 and 2 with a special token <separate>.
 
