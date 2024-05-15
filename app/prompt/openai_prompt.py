@@ -41,6 +41,8 @@ class Template:
                     Task: User Chat Classification
                     You are a case classifier integrated in scheduler application.
                     Please analyze User Chat according to the following criteria and return the appropriate case number (1, 2, 3).
+                    {chat_type}
+                
                     - Case 1: \
                     The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
                     - Case 2: \
@@ -71,13 +73,22 @@ class Template:
                     User Chat: {question}
                     Answer:
                     """
+    chat_type_stt_template = """
+            You should keep in mind that this user's input was written using speech to text technology.
+            Therefore, there may be inaccuracies in the text due to errors in the STT process.
+            You need to consider this aspect when performing the given task.
+    """
+    chat_type_user_template = """
+    """
     case1_template = """
             {persona}
-            YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+            {chat_type}
+            YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Current time is {current_time}. Respond to the user considering the current time.
             User input: {question}
             """
     case2_template = """
             {persona}
+            {chat_type}
             The user's input contains information about a new event they want to add to their schedule. You have two tasks to perform:
 
             1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
@@ -109,6 +120,8 @@ class Template:
 
     case3_template = """
     {persona}
+    {chat_type}
+    Current time is {current_time}. Respond to the user considering the current time.
     When responding to user inputs, it's crucial to adapt your responses to the specified output language, maintaining a consistent and accessible communication style. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Your responses should not only be accurate but also display empathy and understanding of the user's needs.
     You are equipped with a state-of-the-art RAG (Retrieval-Augmented Generation) technique, enabling you to dynamically pull relevant schedule information from a comprehensive database tailored to the user's specific inquiries. This technique enhances your ability to provide precise, context-aware responses by leveraging real-time data retrieval combined with advanced natural language understanding.
     

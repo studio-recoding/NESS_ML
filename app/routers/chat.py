@@ -38,29 +38,36 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
                             model_name=config_chat['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
-    question = data.prompt
+    question = data.prompt # 유저로부터 받은 채팅의 내용
+    chat_type = data.chatType # 위스퍼 사용 여부 [STT, USER]
 
     # description: give NESS's instruction as for case analysis
     my_template = openai_prompt.Template.case_classify_template
 
-    prompt = PromptTemplate.from_template(my_template)
-    case = chat_model.predict(prompt.format(question=question))
+    # chat type에 따라 적합한 프롬프트를 삽입
+    if chat_type == "STT":
+        chat_type_prompt = openai_prompt.Template.chat_type_stt_template
+    elif chat_type == "USER":
+        chat_type_prompt = openai_prompt.Template.chat_type_user_template
+    else:
+        raise HTTPException(status_code=500, detail="WRONG CHAT TYPE")
 
+    prompt = PromptTemplate.from_template(my_template)
+    case = chat_model.predict(prompt.format(question=question, chat_type=chat_type_prompt))
+
+    # 각 케이스에도 chat type에 따라 적합한 프롬프트 삽입 필요
     print(case)
     case = int(case)
     if case == 1:
-        response = await get_langchain_normal(data)
+        response = await get_langchain_normal(data, chat_type_prompt)
 
     elif case == 2:
-        response = await get_langchain_schedule(data)
+        response = await get_langchain_schedule(data, chat_type_prompt)
 
     elif case == 3:
-        response = await get_langchain_rag(data)
+        response = await get_langchain_rag(data, chat_type_prompt)
 
     else:
-        # print("wrong case classification")
-        # # 적절한 HTTP 상태 코드와 함께 오류 메시지를 반환하거나, 다른 처리를 할 수 있습니다.
-        # raise HTTPException(status_code=400, detail="Wrong case classification")
         response = "좀 더 명확한 요구가 필요해요. 다시 한 번 얘기해주실 수 있나요?"
         case = "Exception"
 
@@ -69,7 +76,7 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
 
 # case 1 : normal
 #@router.post("/case/normal") # 테스트용 엔드포인트
-async def get_langchain_normal(data: PromptRequest): # case 1 : normal
+async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 : normal
     print("running case 1")
     # description: use langchain
     config_normal = config['NESS_NORMAL']
@@ -87,13 +94,14 @@ async def get_langchain_normal(data: PromptRequest): # case 1 : normal
     my_template = openai_prompt.Template.case1_template
 
     prompt = PromptTemplate.from_template(my_template)
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question))
+    current_time = datetime.now()
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response
 
 # case 2 : 일정 생성
 #@router.post("/case/make_schedule") # 테스트용 엔드포인트
-async def get_langchain_schedule(data: PromptRequest):
+async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
     print("running case 2")
     # description: use langchain
     config_normal = config['NESS_NORMAL']
@@ -110,13 +118,13 @@ async def get_langchain_schedule(data: PromptRequest):
 
     prompt = PromptTemplate.from_template(case2_template)
     current_time = datetime.now()
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time))
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response
 
 # case 3 : rag
 #@router.post("/case/rag") # 테스트용 엔드포인트
-async def get_langchain_rag(data: PromptRequest):
+async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
     print("running case 3")
     # description: use langchain
     config_normal = config['NESS_NORMAL']
@@ -137,6 +145,7 @@ async def get_langchain_rag(data: PromptRequest):
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule))
+    current_time = datetime.now()
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response
