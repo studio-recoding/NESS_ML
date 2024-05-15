@@ -41,6 +41,8 @@ class Template:
                     Task: User Chat Classification
                     You are a case classifier integrated in scheduler application.
                     Please analyze User Chat according to the following criteria and return the appropriate case number (1, 2, 3).
+                    {chat_type}
+                
                     - Case 1: \
                     The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
                     - Case 2: \
@@ -71,6 +73,13 @@ class Template:
                     User Chat: {question}
                     Answer:
                     """
+    chat_type_stt_template = """
+            You should keep in mind that this user's input was written using speech to text technology.
+            Therefore, there may be inaccuracies in the text due to errors in the STT process.
+            You need to consider this aspect when performing the given task.
+    """
+    chat_type_user_template = """
+    """
     case1_template = """
             {persona}
             YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.

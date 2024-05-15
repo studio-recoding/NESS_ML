@@ -47,13 +47,14 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     # chat type에 따라 적합한 프롬프트를 삽입
     if chat_type == "STT":
         prompt = PromptTemplate.from_template(my_template)
-        case = chat_model.predict(prompt.format(question=question))
+        chat_type_prompt = openai_prompt.Template.chat_type_stt_template
+        case = chat_model.predict(prompt.format(question=question, chat_type=chat_type_prompt))
     elif chat_type == "USER":
         prompt = PromptTemplate.from_template(my_template)
-        case = chat_model.predict(prompt.format(question=question))
+        chat_type_prompt = openai_prompt.Template.chat_type_user_template
+        case = chat_model.predict(prompt.format(question=question, chat_type=chat_type_prompt))
     else:
-        prompt = PromptTemplate.from_template(my_template)
-        case = chat_model.predict(prompt.format(question=question))
+        raise HTTPException(status_code=500, detail="WRONG CHAT TYPE")
 
     # 각 케이스에도 chat type에 따라 적합한 프롬프트 삽입 필요
     print(case)
@@ -68,9 +69,6 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
         response = await get_langchain_rag(data)
 
     else:
-        # print("wrong case classification")
-        # # 적절한 HTTP 상태 코드와 함께 오류 메시지를 반환하거나, 다른 처리를 할 수 있습니다.
-        # raise HTTPException(status_code=400, detail="Wrong case classification")
         response = "좀 더 명확한 요구가 필요해요. 다시 한 번 얘기해주실 수 있나요?"
         case = "Exception"
 
