@@ -38,14 +38,24 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
                             model_name=config_chat['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
-    question = data.prompt
+    question = data.prompt # 유저로부터 받은 채팅의 내용
+    chat_type = data.chatType # 위스퍼 사용 여부 [STT, USER]
 
     # description: give NESS's instruction as for case analysis
     my_template = openai_prompt.Template.case_classify_template
 
-    prompt = PromptTemplate.from_template(my_template)
-    case = chat_model.predict(prompt.format(question=question))
+    # chat type에 따라 적합한 프롬프트를 삽입
+    if chat_type == "STT":
+        prompt = PromptTemplate.from_template(my_template)
+        case = chat_model.predict(prompt.format(question=question))
+    elif chat_type == "USER":
+        prompt = PromptTemplate.from_template(my_template)
+        case = chat_model.predict(prompt.format(question=question))
+    else:
+        prompt = PromptTemplate.from_template(my_template)
+        case = chat_model.predict(prompt.format(question=question))
 
+    # 각 케이스에도 chat type에 따라 적합한 프롬프트 삽입 필요
     print(case)
     case = int(case)
     if case == 1:
