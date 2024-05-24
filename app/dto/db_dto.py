@@ -11,6 +11,10 @@ class AddScheduleDTO(BaseModel):
     location: str
     person: str
 
+class DeleteScheduleDTO(BaseModel):
+    schedule_id: int
+    member_id: int
+
 class RecommendationMainRequestDTO(BaseModel):
     member_id: int
     user_persona: str
