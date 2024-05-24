@@ -10,7 +10,7 @@ from fastapi import Depends
 import os
 import datetime
 from dotenv import load_dotenv
-from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
+from app.dto.db_dto import AddScheduleDTO, DeleteScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
@@ -61,6 +61,15 @@ async def add_db_data(schedule_data: AddScheduleDTO):
     return True
 
 # 메인페이지 한 줄 추천 기능에 사용하는 함수
+async def delete_db_data(schedule_data: DeleteScheduleDTO):
+    member_id = schedule_data.member_id
+    schedule_id = schedule_data.schedule_id
+    schedules.delete(
+        ids=[str(schedule_id)],
+        where={"member": {"$eq": int(member_id)}}
+    )
+    return True
+
 # 유저의 id, 해당 날짜로 필터링
 async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
     member = user_data.member_id
