@@ -134,12 +134,13 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
                             model_name=config_normal['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
+    member_id = data.member_id
     question = data.prompt
     persona = data.persona
     user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
     # vectordb.search_db_query를 비동기적으로 호출합니다.
-    schedule = await vectordb.search_db_query(question)  # vector db에서 검색
+    schedule = await vectordb.search_db_query(member_id, question)  # vector db에서 검색
 
     # description: give NESS's ideal instruction as template
     case3_template = openai_prompt.Template.case3_template

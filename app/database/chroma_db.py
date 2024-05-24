@@ -37,12 +37,12 @@ def check_db_heartbeat():
     chroma_client.heartbeat()
 
 # description: DB에서 검색하는 함수 - chat case 3에 사용
-async def search_db_query(query):
-    # 컬렉션 생성
-    # 컬렉션에 쿼리 전송
+async def search_db_query(member_id, query):
+    member = member_id
     result = schedules.query(
         query_texts=query,
-        n_results=5  # 결과에서 한 가지 문서만 반환하면 한강공원이, 두 가지 문서 반환하면 AI가 뜸->유사도가 이상하게 검사되는 것 같음
+        n_results=5,  # 결과에서 한 가지 문서만 반환하면 한강공원이, 두 가지 문서 반환하면 AI가 뜸->유사도가 이상하게 검사되는 것 같음
+        where={"member": {"$eq": int(member)}}
     )
     return result
 
