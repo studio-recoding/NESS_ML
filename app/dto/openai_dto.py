@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List
 
 class PromptRequest(BaseModel):
+    member_id: int
     prompt: str
     persona: str
     chatType: str
