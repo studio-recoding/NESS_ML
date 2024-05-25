@@ -31,7 +31,17 @@ async def add_schedule_endpoint(schedule_data: AddScheduleDTO, chroma_client=Dep
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/delete_schedule", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete_schedule", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_schedule_endpoint(schedule_data: DeleteScheduleDTO, chroma_client=Depends(get_chroma_client)):
+    try:
+        # 직접 `add_db_data` 함수를 비동기적으로 호출합니다.
+        await delete_db_data(schedule_data)
+        return {"message": "Schedule delete successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/delete_schedule", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_schedule_endpoint(schedule_data: DeleteScheduleDTO, chroma_client=Depends(get_chroma_client)):
     try:
         # 직접 `add_db_data` 함수를 비동기적으로 호출합니다.
