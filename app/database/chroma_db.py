@@ -10,7 +10,7 @@ from fastapi import Depends
 import os
 import datetime
 from dotenv import load_dotenv
-from app.dto.db_dto import AddScheduleDTO, DeleteScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
+from app.dto.db_dto import AddScheduleDTO, DeleteScheduleDTO, UpdateScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
@@ -67,6 +67,31 @@ async def delete_db_data(schedule_data: DeleteScheduleDTO):
     schedules.delete(
         ids=[str(schedule_id)],
         where={"member": {"$eq": int(member_id)}}
+    )
+    return True
+
+# 데이터베이스 업데이트 함수 정의
+async def update_db_data(schedule_data: UpdateScheduleDTO):
+    schedule_date = schedule_data.schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    date = int(schedule_date.split("-")[2])
+
+    # 기존 스케줄 업데이트 로직
+    schedules.update(
+        documents=[schedule_data.data],
+        ids=[str(schedule_data.schedule_id)],
+        metadatas=[{
+            "year": year,
+            "month": month,
+            "date": date,
+            "datetime_start": schedule_data.schedule_datetime_start,
+            "datetime_end": schedule_data.schedule_datetime_end,
+            "member": schedule_data.member_id,
+            "category": schedule_data.category,
+            "location": schedule_data.location,
+            "person": schedule_data.person
+        }]
     )
     return True
 
