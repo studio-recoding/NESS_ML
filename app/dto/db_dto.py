@@ -8,6 +8,7 @@ class AddScheduleDTO(BaseModel):
     schedule_id: int
     member_id: int
     category: str
+    category_id: int
     location: str
     person: str
 
@@ -22,6 +23,7 @@ class UpdateScheduleDTO(BaseModel):
     schedule_id: int
     member_id: int
     category: str
+    category_id: int
     location: str
     person: str
 
