@@ -8,11 +8,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 
 from app.dto.db_dto import RecommendationMainRequestDTO
-<<<<<<< Updated upstream
 from app.dto.openai_dto import RecommendationResponse, ActivityDescription
-=======
-from app.dto.openai_dto import RecommendationResponse
->>>>>>> Stashed changes
 from app.prompt import openai_prompt, persona_prompt
 import app.database.chroma_db as vectordb
 
@@ -54,7 +50,6 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
         prompt = PromptTemplate.from_template(recommendation_template)
-<<<<<<< Updated upstream
         ness = chat_model.predict(prompt.format(persona=user_persona_prompt,
                                                 output_language="Korean",
                                                 schedule=day_schedule
@@ -87,12 +82,6 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         response = RecommendationResponse(ness=ness, activityList=activity_list)
 
         return response
-=======
-        ness = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", schedule=schedule))
-        print(ness)
-
-        return RecommendationResponse(ness=ness)
->>>>>>> Stashed changes
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

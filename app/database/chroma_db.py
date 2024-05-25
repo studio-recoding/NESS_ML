@@ -10,7 +10,7 @@ from fastapi import Depends
 import os
 import datetime
 from dotenv import load_dotenv
-from app.dto.db_dto import AddScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
+from app.dto.db_dto import AddScheduleDTO, DeleteScheduleDTO, UpdateScheduleDTO, RecommendationMainRequestDTO, ReportTagsRequestDTO
 
 load_dotenv()
 CHROMA_DB_IP_ADDRESS = os.getenv("CHROMA_DB_IP_ADDRESS")
@@ -37,12 +37,12 @@ def check_db_heartbeat():
     chroma_client.heartbeat()
 
 # description: DB에서 검색하는 함수 - chat case 3에 사용
-async def search_db_query(query):
-    # 컬렉션 생성
-    # 컬렉션에 쿼리 전송
+async def search_db_query(member_id, query):
+    member = member_id
     result = schedules.query(
         query_texts=query,
-        n_results=5  # 결과에서 한 가지 문서만 반환하면 한강공원이, 두 가지 문서 반환하면 AI가 뜸->유사도가 이상하게 검사되는 것 같음
+        n_results=15,  # 결과에서 한 가지 문서만 반환하면 한강공원이, 두 가지 문서 반환하면 AI가 뜸->유사도가 이상하게 검사되는 것 같음
+        where={"member": {"$eq": int(member)}}
     )
     return result
 
@@ -50,17 +50,63 @@ async def search_db_query(query):
 # 스프링 백엔드로부터 chroma DB에 저장할 데이터를 받아 DB에 추가한다.
 async def add_db_data(schedule_data: AddScheduleDTO):
     schedule_date = schedule_data.schedule_datetime_start.split("T")[0]
-    year = int(schedule_date.split("-")[0])
-    month = int(schedule_date.split("-")[1])
-    date = int(schedule_date.split("-")[2])
+    year, month, date = map(int, schedule_date.split("-"))
+
     schedules.add(
         documents=[schedule_data.data],
         ids=[str(schedule_data.schedule_id)],
-        metadatas=[{"year": year, "month": month, "date": date, "datetime_start": schedule_data.schedule_datetime_start, "datetime_end": schedule_data.schedule_datetime_end, "member": schedule_data.member_id, "category": schedule_data.category, "location": schedule_data.location, "person": schedule_data.person}]
+        metadatas=[{
+            "year": year,
+            "month": month,
+            "date": date,
+            "datetime_start": schedule_data.schedule_datetime_start,
+            "datetime_end": schedule_data.schedule_datetime_end,
+            "member": schedule_data.member_id,
+            "category": schedule_data.category,
+            "category_id": schedule_data.schedule_id,
+            "location": schedule_data.location,
+            "person": schedule_data.person
+        }]
     )
     return True
 
+
 # 메인페이지 한 줄 추천 기능에 사용하는 함수
+async def delete_db_data(schedule_data: DeleteScheduleDTO):
+    member_id = schedule_data.member_id
+    schedule_id = schedule_data.schedule_id
+    schedules.delete(
+        ids=[str(schedule_id)],
+        where={"member": {"$eq": int(member_id)}}
+    )
+    return True
+
+# 데이터베이스 업데이트 함수 정의
+async def update_db_data(schedule_data: UpdateScheduleDTO):
+    schedule_date = schedule_data.schedule_datetime_start.split("T")[0]
+    year = int(schedule_date.split("-")[0])
+    month = int(schedule_date.split("-")[1])
+    date = int(schedule_date.split("-")[2])
+
+    # 기존 스케줄 업데이트 로직
+    schedules.update(
+        documents=[schedule_data.data],
+        ids=[str(schedule_data.schedule_id)],
+        metadatas=[{
+            "year": year,
+            "month": month,
+            "date": date,
+            "datetime_start": schedule_data.schedule_datetime_start,
+            "datetime_end": schedule_data.schedule_datetime_end,
+            "member": schedule_data.member_id,
+            "category": schedule_data.category,
+            "category_id": schedule_data.schedule_id,
+            "location": schedule_data.location,
+            "person": schedule_data.person
+        }]
+    )
+    return True
+
 # 유저의 id, 해당 날짜로 필터링
 async def db_daily_schedule(user_data: RecommendationMainRequestDTO):
     member = user_data.member_id

@@ -7,7 +7,23 @@ class AddScheduleDTO(BaseModel):
     schedule_datetime_end: str
     schedule_id: int
     member_id: int
-    category: int
+    category: str
+    category_id: int
+    location: str
+    person: str
+
+class DeleteScheduleDTO(BaseModel):
+    schedule_id: int
+    member_id: int
+
+class UpdateScheduleDTO(BaseModel):
+    data: str
+    schedule_datetime_start: str
+    schedule_datetime_end: str
+    schedule_id: int
+    member_id: int
+    category: str
+    category_id: int
     location: str
     person: str
 

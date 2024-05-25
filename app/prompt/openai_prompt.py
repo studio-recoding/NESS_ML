@@ -41,6 +41,8 @@ class Template:
                     Task: User Chat Classification
                     You are a case classifier integrated in scheduler application.
                     Please analyze User Chat according to the following criteria and return the appropriate case number (1, 2, 3).
+                    {chat_type}
+                
                     - Case 1: \
                     The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
                     - Case 2: \
@@ -71,44 +73,60 @@ class Template:
                     User Chat: {question}
                     Answer:
                     """
+    chat_type_stt_template = """
+            You should keep in mind that this user's input was written using speech to text technology.
+            Therefore, there may be inaccuracies in the text due to errors in the STT process.
+            You need to consider this aspect when performing the given task.
+    """
+    chat_type_user_template = """
+    """
     case1_template = """
             {persona}
-            YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+            {chat_type}
+            YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Current time is {current_time}. Respond to the user considering the current time.
             User input: {question}
             """
+
     case2_template = """
-            {persona}
-            The user's input contains information about a new event they want to add to their schedule. You have two tasks to perform:
+    {persona}
+    {chat_type}
+    The user's input contains information about a new event they want to add to their schedule. You have two tasks to perform:
 
-            1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
-            2. Organize the event the user wants to add into a json format for saving in a database. The returned json will have keys for info, location, person, and date.
-            - info: Summarizes what the user wants to do. This value must always be present.
-            - location: If the user's event information includes a place, save that place as the value.
-            - person: If the user's event mentions a person they want to include, save that person as the value.
-            - date: If the user's event information includes a specific date and time, save that date and time in datetime format. Dates should be organized based on the current time at the user's location. Current time is {current_time}.
-            Separate the outputs for tasks 1 and 2 with a special token <separate>.
+    1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+    2. Organize the event the user wants to add into a json format for saving in a database. The returned json will have keys for info, location, person, start_time, end_time, and category.
+    - info: Summarizes what the user wants to do. This value must always be present.
+    - location: If the user's event information includes a place, save that place as the value.
+    - person: If the user's event mentions a person they want to include, save that person as the value.
+    - start_time: If the user's event information includes a specific date and time, save that date and time in datetime format. Dates should be organized based on the current time at the user's location. Current time is {current_time}.
+    - end_time: If the user's event information includes an end time, save that date and time in datetime format.
+    - category: Choose the most appropriate category for the event from the following list: {categories}.
+    Separate the outputs for tasks 1 and 2 with a special token <separate>.
 
-            Example for one-shot learning:
+    Example for one-shot learning:
 
-            User input: I have a meeting with Dr. Smith at her office on March 3rd at 10am.
+    User input: I have a meeting with Dr. Smith at her office on March 3rd from 10am to 11am.
 
-            Response to user:
-            Shall I add your meeting with Dr. Smith at her office on March 3rd at 10am to your schedule?
-            <separate>
-            {{
-            "info": "meeting with Dr. Smith",
-            "location": "Dr. Smith's office",
-            "person": "Dr. Smith",
-            "date": "2023-03-03T10:00:00"
-            }}
-            
-            User input: {question}
-            
-            Response to user:
-            """
+    Response to user:
+    Shall I add your meeting with Dr. Smith at her office on March 3rd from 10am to 11am to your schedule?
+    <separate>
+    {{
+    "info": "meeting with Dr. Smith",
+    "location": "Dr. Smith's office",
+    "person": "Dr. Smith",
+    "start_time": "2023-03-03T10:00:00",
+    "end_time": "2023-03-03T11:00:00",
+    "category": "Work"
+    }}
+
+    User input: {question}
+
+    Response to user:
+    """
 
     case3_template = """
     {persona}
+    {chat_type}
+    Current time is {current_time}. Respond to the user considering the current time.
     When responding to user inputs, it's crucial to adapt your responses to the specified output language, maintaining a consistent and accessible communication style. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Your responses should not only be accurate but also display empathy and understanding of the user's needs.
     You are equipped with a state-of-the-art RAG (Retrieval-Augmented Generation) technique, enabling you to dynamically pull relevant schedule information from a comprehensive database tailored to the user's specific inquiries. This technique enhances your ability to provide precise, context-aware responses by leveraging real-time data retrieval combined with advanced natural language understanding.
     
