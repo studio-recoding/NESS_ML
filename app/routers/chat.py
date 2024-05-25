@@ -8,6 +8,7 @@ from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from datetime import datetime
 
+from app.database.connect_rds import fetch_category_classification_data
 from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
 from app.prompt import openai_prompt, persona_prompt
 
@@ -102,25 +103,48 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
 # case 2 : 일정 생성
 #@router.post("/case/make_schedule") # 테스트용 엔드포인트
 async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
-    print("running case 2")
-    # description: use langchain
-    config_normal = config['NESS_NORMAL']
+    try:
+        print("running case 2")
+        member_id = data.member_id
+        categories = fetch_category_classification_data(member_id)
+        # 카테고리 데이터를 텍스트로 변환 (JSON 형식으로 변환)
+        categories_text = ", ".join([category['name'] for category in categories])
+        print(categories_text)
 
-    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
-                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
-                            model_name=config_normal['MODEL_NAME'],  # 모델명
-                            openai_api_key=OPENAI_API_KEY  # API 키
-                            )
-    question = data.prompt
-    persona = data.persona
-    user_persona_prompt = persona_prompt.Template.from_persona(persona)
-    case2_template = openai_prompt.Template.case2_template
+        # description: use langchain
+        config_normal = config['NESS_NORMAL']
 
-    prompt = PromptTemplate.from_template(case2_template)
-    current_time = datetime.now()
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
-    print(response)
-    return response
+        chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                                max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
+                                model_name=config_normal['MODEL_NAME'],  # 모델명
+                                openai_api_key=OPENAI_API_KEY  # API 키
+                                )
+
+        question = data.prompt
+        persona = data.persona
+        user_persona_prompt = persona_prompt.Template.from_persona(persona)
+        case2_template = openai_prompt.Template.case2_template
+
+        prompt = PromptTemplate.from_template(case2_template)
+        current_time = datetime.now()
+
+        # OpenAI 프롬프트에 데이터 통합
+        response = chat_model.predict(
+            prompt.format(
+                persona=user_persona_prompt,
+                output_language="Korean",
+                question=question,
+                current_time=current_time,
+                chat_type=chat_type_prompt,
+                categories=categories_text  # 카테고리 데이터를 프롬프트에 포함
+            )
+        )
+
+        print(response)
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # case 3 : rag
 #@router.post("/case/rag") # 테스트용 엔드포인트
