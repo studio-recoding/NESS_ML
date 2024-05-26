@@ -45,6 +45,7 @@ class RecommendationSchedule(BaseModel):
     location: str
     info: str
 class ListRecommendationRequest(BaseModel):
+    persona: str
     todoList: List[RecommendationSchedule]
 
 class ListRecommendationPair(BaseModel):
@@ -52,5 +53,3 @@ class ListRecommendationPair(BaseModel):
     nessComment: str
 class ListRecommendationResponse(BaseModel):
     recommendationList: List[ListRecommendationPair]
-
-
