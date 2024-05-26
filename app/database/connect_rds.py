@@ -9,6 +9,7 @@ load_dotenv()
 def get_rds_connection():
     return pymysql.connect(
         host=os.getenv('RDS_HOST'),
+        port=3306,
         user=os.getenv('RDS_USER'),
         password=os.getenv('RDS_PASSWORD'),
         database=os.getenv('RDS_DATABASE'),

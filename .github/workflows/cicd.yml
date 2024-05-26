@@ -18,6 +18,10 @@ jobs:
     env:
       OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
       CHROMA_DB_IP_ADDRESS: ${{secrets.CHROMA_DB_IP_ADDRESS}}
+      RDS_HOST: ${{ secrets.RDS_HOST }}
+      RDS_USER: ${{ secrets.RDS_USER }}
+      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      RDS_DATABASE: ${{ secrets.RDS_DATABASE }}
 
     steps:
       - name: Checkout
@@ -27,6 +31,10 @@ jobs:
         run: |
           echo "CHROMA_DB_IP_ADDRESS=${{ secrets.CHROMA_DB_IP_ADDRESS }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "RDS_HOST=${{ secrets.RDS_HOST }}" >> .env
+          echo "RDS_USER=${{ secrets.RDS_USER }}" >> .env
+          echo "RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
+          echo "RDS_DATABASE=${{ secrets.RDS_DATABASE }}" >> .env
         shell: bash
 
       - name: Setup docker buildx
@@ -84,4 +92,8 @@ jobs:
           docker run -d -p 80:80 --name ${{ env.NAME }} --restart always \
           -e CHROMA_DB_IP_ADDRESS=${{ secrets.CHROMA_DB_IP_ADDRESS }} \
           -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+          -e RDS_HOST=${{ secrets.RDS_HOST }} \
+          -e RDS_USER=${{ secrets.RDS_USER }} \
+          -e RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+          -e RDS_DATABASE=${{ secrets.RDS_DATABASE }} \
           ${{ env.DOCKER_IMAGE }}:latest

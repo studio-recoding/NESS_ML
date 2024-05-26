@@ -107,9 +107,11 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         print("running case 2")
         member_id = data.member_id
         categories = fetch_category_classification_data(member_id)
-        # 카테고리 데이터를 텍스트로 변환 (JSON 형식으로 변환)
-        categories_text = ", ".join([category['name'] for category in categories])
-        print(categories_text)
+        # 카테고리 데이터를 딕셔너리 형태로 변환
+        categories_dict = [
+            {"name": category['name'], "id": category['category_id'], "color": category['color']}
+            for category in categories
+        ]
 
         # description: use langchain
         config_normal = config['NESS_NORMAL']
@@ -136,7 +138,7 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
                 question=question,
                 current_time=current_time,
                 chat_type=chat_type_prompt,
-                categories=categories_text  # 카테고리 데이터를 프롬프트에 포함
+                categories=categories_dict  # 카테고리 데이터를 프롬프트에 포함
             )
         )
 
