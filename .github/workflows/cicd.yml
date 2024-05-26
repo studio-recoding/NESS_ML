@@ -27,6 +27,10 @@ jobs:
         run: |
           echo "CHROMA_DB_IP_ADDRESS=${{ secrets.CHROMA_DB_IP_ADDRESS }}" >> .env
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "RDS_HOST=${{ secrets.RDS_HOST }}" >> .env
+          echo "RDS_USER=${{ secrets.RDS_USER }}" >> .env
+          echo "RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
+          echo "RDS_DATABASE=${{ secrets.RDS_DATABASE }}" >> .env
         shell: bash
 
       - name: Setup docker buildx
