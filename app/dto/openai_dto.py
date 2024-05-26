@@ -33,3 +33,23 @@ class RecommendationResponse(BaseModel):
     ness: str
     activityList: List[ActivityDescription]
 
+class CategoryInfo(BaseModel):
+    categoryName: str
+    categoryId: int
+    categoryColor: str
+
+class RecommendationSchedule(BaseModel):
+    startTime: str
+    category: CategoryInfo
+    person: str
+    location: str
+    info: str
+class ListRecommendationRequest(BaseModel):
+    persona: str
+    todoList: List[RecommendationSchedule]
+
+class ListRecommendationPair(BaseModel):
+    todo: RecommendationSchedule
+    nessComment: str
+class ListRecommendationResponse(BaseModel):
+    recommendationList: List[ListRecommendationPair]
