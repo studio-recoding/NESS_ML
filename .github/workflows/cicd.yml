@@ -18,6 +18,10 @@ jobs:
     env:
       OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
       CHROMA_DB_IP_ADDRESS: ${{secrets.CHROMA_DB_IP_ADDRESS}}
+      RDS_HOST: ${{ secrets.RDS_HOST }}
+      RDS_USER: ${{ secrets.RDS_USER }}
+      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      RDS_DATABASE: ${{ secrets.RDS_DATABASE }}
 
     steps:
       - name: Checkout
