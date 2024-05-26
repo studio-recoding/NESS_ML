@@ -92,4 +92,8 @@ jobs:
           docker run -d -p 80:80 --name ${{ env.NAME }} --restart always \
           -e CHROMA_DB_IP_ADDRESS=${{ secrets.CHROMA_DB_IP_ADDRESS }} \
           -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+          -e RDS_HOST=${{ secrets.RDS_HOST }} \
+          -e RDS_USER=${{ secrets.RDS_USER }} \
+          -e RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+          -e RDS_DATABASE=${{ secrets.RDS_DATABASE }} \
           ${{ env.DOCKER_IMAGE }}:latest
