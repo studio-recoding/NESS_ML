@@ -26,7 +26,7 @@ class Template:
                     2. Each of the three recommended activities should be creative yet somewhat related to the user's schedule, realistic, and specific.
                     3. Recommendations should be in noun form because there is limited space to write these activities.
                     4. Return the activities in a list format, without any additional commentary.
-                    5. The user's schedule may not exist, and if so, do not randomly create the user's schedule and only recommend activities according to established rules.
+                    5. The user's schedule may not exist, and if so, do not randomly create the user's schedule and only recommend activities that helps the user.
                     
                     Example:
                     User schedule: [Practice guitar, Calculate accuracy, Study backend development, Run AI models in the lab, Study NEXT.JS]

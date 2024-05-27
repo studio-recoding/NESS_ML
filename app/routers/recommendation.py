@@ -61,7 +61,8 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         # 한 줄 추천 기반 활동 추천하기
         month_schedule = await vectordb.activity_recommendation_schedule(user_data, ness)
         print(month_schedule)
-        if not month_schedule:
+        # month_schedule이 비어있거나 [[]]인 경우 "No schedule"로 설정
+        if not month_schedule or month_schedule == [[]]:
             month_schedule = "No schedule"
         print(month_schedule)
 
@@ -73,11 +74,15 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
                                                                       ))
         print(activity_response)
 
+        # AI 응답 파싱
         try:
+            # activity_response에서 "AI Recommendation:" 부분을 제거하고, [] 사이의 텍스트만 남김
             if activity_response.startswith("AI Recommendation:"):
                 activity_response = activity_response[len("AI Recommendation:"):]
-            activity_response = activity_response.strip("[]")
-            activities = [act.strip().strip('\"') for act in activity_response.split(',')]
+            activity_response = activity_response.strip()
+            if activity_response.startswith("[") and activity_response.endswith("]"):
+                activity_response = activity_response[1:-1]
+            activities = [act.strip().strip('"') for act in activity_response.split(',')]
         except (SyntaxError, ValueError):
             print("Error parsing the response")
             activities = []
