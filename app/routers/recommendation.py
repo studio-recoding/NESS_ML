@@ -1,6 +1,7 @@
 import configparser
 import os
 import json
+import ast
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -60,6 +61,9 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         # 한 줄 추천 기반 활동 추천하기
         month_schedule = await vectordb.activity_recommendation_schedule(user_data, ness)
         print(month_schedule)
+        if not month_schedule:
+            month_schedule = "No schedule"
+        print(month_schedule)
 
         activity_template = openai_prompt.Template.activity_template
         activity_prompt = PromptTemplate.from_template(activity_template)
@@ -70,9 +74,12 @@ async def get_recommendation(user_data: RecommendationMainRequestDTO) -> Recomme
         print(activity_response)
 
         try:
-            activities = json.loads(activity_response)
-        except json.JSONDecodeError:
-            print("Error parsing the JSON response")
+            if activity_response.startswith("AI Recommendation:"):
+                activity_response = activity_response[len("AI Recommendation:"):]
+            activity_response = activity_response.strip("[]")
+            activities = [act.strip().strip('\"') for act in activity_response.split(',')]
+        except (SyntaxError, ValueError):
+            print("Error parsing the response")
             activities = []
 
         # Generate ActivityDescription objects
