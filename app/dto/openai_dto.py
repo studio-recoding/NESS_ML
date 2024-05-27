@@ -39,6 +39,7 @@ class CategoryInfo(BaseModel):
     categoryColor: str
 
 class RecommendationSchedule(BaseModel):
+    id: int
     startTime: str
     category: CategoryInfo
     person: str
