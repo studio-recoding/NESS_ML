@@ -72,6 +72,6 @@ NESS의 ML 서버는 다음과 같은 프로그램을 통해서 API를 테스트
 ## 📌 Description of used open source
 NESS의 ML 서버는 다음과 같은 오픈 소스를 사용하고 있습니다.
 <div>
-<img alt="FastAPI" src ="https://img.shields.io/badge/spring boot-009688.svg?&style=for-the-badge&logo=fastapi&logoColor=white"/>
+<img alt="FastAPI" src ="https://img.shields.io/badge/fastapi-009688.svg?&style=for-the-badge&logo=fastapi&logoColor=white"/>
 </div>
 
