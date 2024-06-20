@@ -10,3 +10,6 @@ chroma.log
 
 # all __pycache__
 **/__pycache__/
+
+.git
+/venv/
