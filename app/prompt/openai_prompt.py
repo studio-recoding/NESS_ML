@@ -26,6 +26,7 @@ class Template:
                     2. Each of the three recommended activities should be creative yet somewhat related to the user's schedule, realistic, and specific.
                     3. Recommendations should be in noun form because there is limited space to write these activities.
                     4. Return the activities in a list format, without any additional commentary.
+                    5. The user's schedule may not exist, and if so, do not randomly create the user's schedule and only recommend activities that helps the user.
                     
                     Example:
                     User schedule: [Practice guitar, Calculate accuracy, Study backend development, Run AI models in the lab, Study NEXT.JS]
@@ -34,6 +35,28 @@ class Template:
                     User schedule: {schedule}
                     AI Recommendation:
                     
+    """
+
+    recommendation_list_template = """
+            Task: Generate comments for each schedule
+            {persona}
+
+            You will receive a list of the user's schedule information. Your task is to understand each schedule and generate a comment for each. There are a few rules you must follow in your comments:
+            1. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+            2. Each comment should be concise, relevant to the schedule details, and realistic.
+            3. Comments should be in sentence form, suitable for displaying alongside the schedule.
+            4. Return the comments in a list format, without any additional commentary.
+            
+            Example:
+            User schedule: 
+            Start Time: 2024-05-25T18:00:00, Category: 공부 (ID: 1, Color: #0000FF), Person: 민주, Location: (Location not specified), Info: NEST.JS 공부하기
+            Start Time: 2024-05-25T20:00:00, Category: 약속 (ID: 2, Color: #008000), Person: (Person not specified), Location: (Location not specified), Info: 개발 공모전 미팅하기
+            Start Time: 2024-05-26T18:00:00, Category: 여가 (ID: 3, Color: #FF0000), Person: 채원, Location: 한강, Info: 친구랑 한강 놀러가기
+
+            AI Comments: ["민주님과 어디에서 만나지는 정하셨나요? 장소가 정해지지 않았어요.", "오늘의 날씨는 확인하셨나요? 친구와 즐겁게 피크닉을 즐기세요!", "오늘의 날씨는 확인하셨나요? 친구와 즐겁게 피크닉을 즐기세요!"]
+            
+            User schedule: {schedule_list}
+            AI Comments:
     """
 
     # case 분류 잘 안됨 - 수정 필요
