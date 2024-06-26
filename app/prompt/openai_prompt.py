@@ -136,30 +136,30 @@ class Template:
             Shall I add your meeting with Dr. Smith at her office on March 3rd from 10am to 11am and your dinner with John at the Italian restaurant on March 4th at 7pm to your schedule?
             <separate>
             [
-              {
+              {{
                 "info": "meeting with Dr. Smith",
                 "location": "Dr. Smith's office",
                 "person": "Dr. Smith",
                 "start_time": "2023-03-03T10:00:00+09:00",
                 "end_time": "2023-03-03T11:00:00+09:00",
-                "category": {
+                "category": {{
                   "name": "Work",
                   "id": 1,
                   "color": "#FF0000"
-                }
-              },
-              {
+                }}
+              }},
+              {{
                 "info": "dinner with John",
                 "location": "Italian restaurant",
                 "person": "John",
                 "start_time": "2023-03-04T19:00:00+09:00",
                 "end_time": null,  // Assuming end time is not specified
-                "category": {
+                "category": {{
                   "name": "Personal",
                   "id": 2,
                   "color": "#00FF00"
-                }
-              }
+                }}
+              }}
             ]
             
             User input: {question}

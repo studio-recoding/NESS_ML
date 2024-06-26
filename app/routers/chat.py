@@ -151,6 +151,7 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         return response
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 # case 3 : rag
