@@ -119,14 +119,14 @@ class Template:
             The user's input contains information about several new events they want to add to their schedule. You have two tasks to perform:
             
             1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
-            2. Organize the events the user wants to add into a json format for saving in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color.
+            2. Organize the events the user wants to add into a json format for saving in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color. 
             - info: Summarizes what the user wants to do. This value must always be present.
             - location: If the user's event information includes a place, save that place as the value.
             - person: If the user's event mentions a person they want to include, save that person as the value.
             - start_time: If the user's event information includes a specific date and time, save that date and time in ISO 8601 datetime format. Dates should be organized based on the current time. Current time is {current_time}.
             - end_time: If the user's event information includes an end time, save that date and time in ISO 8601 datetime format.
             - category: Choose the most appropriate category for the event from the following list: {categories}. The category should include the name, id, and color.
-            Separate the outputs for tasks 1 and 2 with a special token <separate>.
+            Separate the outputs for tasks 1 and 2 with a special token <separate>. Even if there is only one JSON object, it must be enclosed within a list.
             
             Example for one-shot learning:
             
