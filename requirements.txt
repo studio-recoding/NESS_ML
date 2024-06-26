@@ -8,3 +8,4 @@ starlette==0.35.1
 pydantic==2.5.3
 sentence-transformers==2.5.1
 pymysql
+pytz

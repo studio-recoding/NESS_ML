@@ -43,7 +43,7 @@ class Template:
 
             You will receive a list of the user's schedule information. Your task is to understand each schedule and generate a comment for each. There are a few rules you must follow in your comments:
             1. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
-            2. Each comment should be concise, relevant to the schedule details, and realistic.
+            2. Each comment should be concise, relevant to the schedule details, and realistic. You are able to give advice to the user, if needed.
             3. Comments should be in sentence form, suitable for displaying alongside the schedule.
             4. Return the comments in a list format, without any additional commentary.
             
@@ -116,40 +116,54 @@ class Template:
     case2_template = """
             {persona}
             {chat_type}
-            The user's input contains information about a new event they want to add to their schedule. You have two tasks to perform:
-        
+            The user's input contains information about several new events they want to add to their schedule. You have two tasks to perform:
+            
             1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
-            2. Organize the event the user wants to add into a json format for saving in a database. The returned json will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color.
+            2. Organize the events the user wants to add into a json format for saving in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color.
             - info: Summarizes what the user wants to do. This value must always be present.
             - location: If the user's event information includes a place, save that place as the value.
             - person: If the user's event mentions a person they want to include, save that person as the value.
-            - start_time: If the user's event information includes a specific date and time, save that date and time in datetime format. Dates should be organized based on the current time at the user's location. Current time is {current_time}.
-            - end_time: If the user's event information includes an end time, save that date and time in datetime format.
+            - start_time: If the user's event information includes a specific date and time, save that date and time in ISO 8601 datetime format. Dates should be organized based on the current time. Current time is {current_time}.
+            - end_time: If the user's event information includes an end time, save that date and time in ISO 8601 datetime format.
             - category: Choose the most appropriate category for the event from the following list: {categories}. The category should include the name, id, and color.
             Separate the outputs for tasks 1 and 2 with a special token <separate>.
-        
+            
             Example for one-shot learning:
-        
-            User input: I have a meeting with Dr. Smith at her office on March 3rd from 10am to 11am.
-        
+            
+            User input: I have a meeting with Dr. Smith at her office on March 3rd from 10am to 11am, and a dinner with John at the Italian restaurant on March 4th at 7pm.
+            
             Response to user:
-            Shall I add your meeting with Dr. Smith at her office on March 3rd from 10am to 11am to your schedule?
+            Shall I add your meeting with Dr. Smith at her office on March 3rd from 10am to 11am and your dinner with John at the Italian restaurant on March 4th at 7pm to your schedule?
             <separate>
-            {{
-            "info": "meeting with Dr. Smith",
-            "location": "Dr. Smith's office",
-            "person": "Dr. Smith",
-            "start_time": "2023-03-03T10:00:00",
-            "end_time": "2023-03-03T11:00:00",
-            "category": {{
-                "name": "Work",
-                "id": 1,
-                "color": "#FF0000"
-            }}
-            }}
-        
+            [
+              {
+                "info": "meeting with Dr. Smith",
+                "location": "Dr. Smith's office",
+                "person": "Dr. Smith",
+                "start_time": "2023-03-03T10:00:00+09:00",
+                "end_time": "2023-03-03T11:00:00+09:00",
+                "category": {
+                  "name": "Work",
+                  "id": 1,
+                  "color": "#FF0000"
+                }
+              },
+              {
+                "info": "dinner with John",
+                "location": "Italian restaurant",
+                "person": "John",
+                "start_time": "2023-03-04T19:00:00+09:00",
+                "end_time": null,  // Assuming end time is not specified
+                "category": {
+                  "name": "Personal",
+                  "id": 2,
+                  "color": "#00FF00"
+                }
+              }
+            ]
+            
             User input: {question}
-        
+            
             Response to user:
     """
 

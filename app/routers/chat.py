@@ -13,6 +13,7 @@ from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
 from app.prompt import openai_prompt, persona_prompt
 
 import app.database.chroma_db as vectordb
+import pytz
 
 router = APIRouter(
     prefix="/chat",
@@ -95,7 +96,9 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
     my_template = openai_prompt.Template.case1_template
 
     prompt = PromptTemplate.from_template(my_template)
-    current_time = datetime.now()
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(seoul_timezone)
+    print(f'current time: {current_time}')
     response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response
@@ -128,7 +131,9 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         case2_template = openai_prompt.Template.case2_template
 
         prompt = PromptTemplate.from_template(case2_template)
-        current_time = datetime.now()
+        seoul_timezone = pytz.timezone('Asia/Seoul')
+        current_time = datetime.now(seoul_timezone)
+        print(f'current time: {current_time}')
 
         # OpenAI 프롬프트에 데이터 통합
         response = chat_model.predict(
@@ -172,7 +177,9 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    current_time = datetime.now()
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(seoul_timezone)
+    print(f'current time: {current_time}')
     response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response
