@@ -62,18 +62,23 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     case = int(case)
     if case == 1:
         response = await get_langchain_normal(data, chat_type_prompt)
+        metadata = "null"
 
     elif case == 2:
-        response = await get_langchain_schedule(data, chat_type_prompt)
+        response_with_metadata = await get_langchain_schedule(data, chat_type_prompt)
+        response = response_with_metadata.split("<separate>")[0]
+        metadata = response_with_metadata.split("<separate>")[1]
 
     elif case == 3:
         response = await get_langchain_rag(data, chat_type_prompt)
+        metadata = "null"
 
     else:
         response = "좀 더 명확한 요구가 필요해요. 다시 한 번 얘기해주실 수 있나요?"
         case = "Exception"
+        metadata = "null"
 
-    return ChatCaseResponse(ness=response, case=case)
+    return ChatCaseResponse(ness=response, case=case, metadata=metadata)
 
 
 # case 1 : normal
