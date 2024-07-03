@@ -46,6 +46,17 @@ async def search_db_query(member_id, query):
     )
     return result
 
+# description: DB에서 검색하는 함수 - chat case 4에 사용
+# 후보들을 선정해서 gpt에게 가장 적합한 스케줄을 선택하라고 할 예정
+async def search_db_query_delete(member_id, query):
+    member = member_id
+    result = schedules.query(
+        query_texts=query,
+        n_results=10,
+        where={"member": {"$eq": int(member)}}
+    )
+    return result
+
 # description: DB에 저장하는 함수
 # 스프링 백엔드로부터 chroma DB에 저장할 데이터를 받아 DB에 추가한다.
 async def add_db_data(schedule_data: AddScheduleDTO):
