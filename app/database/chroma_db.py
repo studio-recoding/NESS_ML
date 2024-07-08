@@ -75,6 +75,7 @@ async def add_db_data(schedule_data: AddScheduleDTO):
             "member": schedule_data.member_id,
             "category": schedule_data.category,
             "category_id": schedule_data.schedule_id,
+            "category_color": schedule_data.category_color,
             "location": schedule_data.location,
             "person": schedule_data.person
         }]
