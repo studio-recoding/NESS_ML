@@ -24,6 +24,7 @@ class UpdateScheduleDTO(BaseModel):
     member_id: int
     category: str
     category_id: int
+    category_color: str
     location: str
     person: str
 

@@ -194,6 +194,7 @@ class Template:
             
             1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
             2. You will be given a list of potential candidates from the database for events that the user may want to delete, and you must organize those events that the user has indicated they want to delete into a list. Organize the events the user wants to delete into a json format to make a delete api call in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color. 
+            - id: Find the id of the schedule in the 'ids'.
             - info: The document data of the schedule.
             - location: Include the venue or place where the event was scheduled to occur.
             - person: List any specific individuals involved in the event.
@@ -214,6 +215,7 @@ class Template:
             <separate>
             [
                 {{
+                    "id": 29
                     "info": "개발 공부하기",
                     "location": "공대",
                     "person": "",
@@ -226,6 +228,7 @@ class Template:
                     }}
                 }},
                 {{
+                    "id": 7
                     "info": "한강 놀러가기",
                     "location": "한강",
                     "person": "혜승",
