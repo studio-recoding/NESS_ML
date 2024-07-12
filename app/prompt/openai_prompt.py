@@ -118,16 +118,18 @@ class Template:
     case2_template = """
             {persona}
             {chat_type}
-            The user's input contains information about several new events they want to add to their schedule. You have two tasks to perform:
+            The user's input contains information about several new events they want to add to their schedule. You have three tasks to perform:
             
             1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
-            2. Organize the events the user wants to add into a json format for saving in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color. 
-            - info: Summarizes what the user wants to do. This value must always be present.
-            - location: If the user's event information includes a place, save that place as the value.
-            - person: If the user's event mentions a person they want to include, save that person as the value.
-            - start_time: If the user's event information includes a specific date and time, save that date and time in ISO 8601 datetime format. Dates should be organized based on the current time. Current time is {current_time}.
-            - end_time: If the user's event information includes an end time, save that date and time in ISO 8601 datetime format.
-            - category: Choose the most appropriate category for the event from the following list: {categories}. The category should include the name, id, and color.
+            2. Organize the events the user wants to add into a json format for saving in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color.
+                - info: Summarizes what the user wants to do. This value must always be present.
+                - location: If the user's event information includes a place, save that place as the value.
+                - person: If the user's event mentions a person they want to include, save that person as the value.
+                - start_time: If the user's event information includes a specific date and time, save that date and time in ISO 8601 datetime format. Dates should be organized based on the current time. Current time is {current_time}.
+                - end_time: If the user's event information includes an end time, save that date and time in ISO 8601 datetime format.
+                - category: Choose the most appropriate category for the event from the following list: {categories}. The category should include the name, id, and color.
+            3. Generate a search keyword for each event that could assist the user in enhancing their planned activity. Include this as a key in each JSON object.
+                - search keyword: Devise a search term related to the event that can help facilitate or complement the user's plans, such as finding study materials for a study session or locating a nearby parking lot for an event venue.
             Separate the outputs for tasks 1 and 2 with a special token <separate>. Even if there is only one JSON object, it must be enclosed within a list.
             
             Example for one-shot learning:
@@ -138,30 +140,32 @@ class Template:
             Shall I add your meeting with Dr. Smith at her office on March 3rd from 10am to 11am and your dinner with John at the Italian restaurant on March 4th at 7pm to your schedule?
             <separate>
             [
-              {{
+              {
                 "info": "meeting with Dr. Smith",
                 "location": "Dr. Smith's office",
                 "person": "Dr. Smith",
                 "start_time": "2023-03-03T10:00:00+09:00",
                 "end_time": "2023-03-03T11:00:00+09:00",
-                "category": {{
+                "category": {
                   "name": "Work",
                   "id": 1,
                   "color": "#FF0000"
-                }}
-              }},
-              {{
+                },
+                "search keyword": "nearby parking Dr. Smith's office"
+              },
+              {
                 "info": "dinner with John",
                 "location": "Italian restaurant",
                 "person": "John",
                 "start_time": "2023-03-04T19:00:00+09:00",
                 "end_time": null,  // Assuming end time is not specified
-                "category": {{
+                "category": {
                   "name": "Personal",
                   "id": 2,
                   "color": "#00FF00"
-                }}
-              }}
+                },
+                "search keyword": "top Italian wines"
+              }
             ]
             
             User input: {question}
