@@ -214,8 +214,7 @@ class Template:
             
             Schedules: {{'ids': [['29', '8', '7', '25', '16']], 'distances': [[0.1681539537965312, 0.17174183647570107, 0.2014914961195574, 0.2014914961195574, 0.21989337760155114]], 'embeddings': None, 'metadatas': [[{{'category': '🍀미분류', 'category_id': 29, 'date': 27, 'datetime_end': '2024-05-27T16:00:00Z', 'datetime_start': '2024-05-27T15:00:00Z', 'location': '공대', 'member': 1, 'month': 5, 'person': '', 'year': 2024}}, {{'category': '공부', 'category_id': 8, 'date': 25, 'datetime_end': '2024-05-25T16:00:00Z', 'datetime_start': '2024-05-25T15:00:00Z', 'location': '카페', 'member': 1, 'month': 5, 'person': '민주, 채원', 'year': 2024}}, {{'category': '공부', 'category_id': 7, 'date': 10, 'datetime_end': '2024-05-10T00:00:00Z', 'datetime_start': '2024-05-10T00:00:00Z', 'location': '한강', 'member': 1, 'month': 5, 'person': '혜승', 'year': 2024}}, {{'category': '🍀미분류', 'category_id': 25, 'date': 10, 'datetime_end': '2024-05-10T00:00:00Z', 'datetime_start': '2024-05-10T00:00:00Z', 'location': '한강', 'member': 1, 'month': 5, 'person': '혜승', 'year': 2024}}, {{'category': '📖 공부', 'category_id': 16, 'date': 15, 'datetime_end': '2024-05-15T16:00:00Z', 'datetime_start': '2024-05-15T15:00:00Z', 'location': '', 'member': 3, 'month': 5, 'person': '', 'year': 2024}}]], 'documents': [['개발 공부하기', '열심히 개발하기', '한강 놀러가기', '한강 놀러가기', '리액트 공부하기']], 'uris': None, 'data': None}}
 
-            Response to user:
-            Shall I add your meeting with Dr. Smith at her office on March 3rd from 10am to 11am and your dinner with John at the Italian restaurant on March 4th at 7pm to your schedule?
+            Response to user: 다음의 일정을 삭제해드릴까요?
             <separate>
             [
                 {{
