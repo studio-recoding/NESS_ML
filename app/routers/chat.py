@@ -13,6 +13,7 @@ from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
 from app.prompt import openai_prompt, persona_prompt
 
 import app.database.chroma_db as vectordb
+import pytz
 
 router = APIRouter(
     prefix="/chat",
@@ -61,18 +62,28 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     case = int(case)
     if case == 1:
         response = await get_langchain_normal(data, chat_type_prompt)
+        metadata = "null"
 
     elif case == 2:
-        response = await get_langchain_schedule(data, chat_type_prompt)
+        response_with_metadata = await get_langchain_schedule(data, chat_type_prompt)
+        response = response_with_metadata.split("<separate>")[0]
+        metadata = response_with_metadata.split("<separate>")[1]
 
     elif case == 3:
         response = await get_langchain_rag(data, chat_type_prompt)
+        metadata = "null"
+
+    elif case == 4:
+        response_with_metadata = await delete_schedule(data, chat_type_prompt)
+        response = response_with_metadata.split("<separate>")[0]
+        metadata = response_with_metadata.split("<separate>")[1]
 
     else:
         response = "좀 더 명확한 요구가 필요해요. 다시 한 번 얘기해주실 수 있나요?"
         case = "Exception"
+        metadata = "null"
 
-    return ChatCaseResponse(ness=response, case=case)
+    return ChatCaseResponse(ness=response, case=case, metadata=metadata)
 
 
 # case 1 : normal
@@ -95,7 +106,9 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
     my_template = openai_prompt.Template.case1_template
 
     prompt = PromptTemplate.from_template(my_template)
-    current_time = datetime.now()
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(seoul_timezone)
+    print(f'current time: {current_time}')
     response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response
@@ -128,7 +141,9 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         case2_template = openai_prompt.Template.case2_template
 
         prompt = PromptTemplate.from_template(case2_template)
-        current_time = datetime.now()
+        seoul_timezone = pytz.timezone('Asia/Seoul')
+        current_time = datetime.now(seoul_timezone)
+        print(f'current time: {current_time}')
 
         # OpenAI 프롬프트에 데이터 통합
         response = chat_model.predict(
@@ -146,6 +161,7 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         return response
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 # case 3 : rag
@@ -172,7 +188,39 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
     case3_template = openai_prompt.Template.case3_template
 
     prompt = PromptTemplate.from_template(case3_template)
-    current_time = datetime.now()
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(seoul_timezone)
+    print(f'current time: {current_time}')
+    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
+    print(response)
+    return response
+
+# case 4 : delete schedule
+async def delete_schedule(data: PromptRequest, chat_type_prompt):
+    print("running case 4: delete schedule")
+
+    config_normal = config['NESS_NORMAL']
+
+    chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
+                            max_tokens=config_normal['MAX_TOKENS'],  # 최대 토큰수
+                            model_name=config_normal['MODEL_NAME'],  # 모델명
+                            openai_api_key=OPENAI_API_KEY  # API 키
+                            )
+    member_id = data.member_id
+    question = data.prompt
+    persona = data.persona
+    user_persona_prompt = persona_prompt.Template.from_persona(persona)
+
+    # vectordb.search_db_query를 비동기적으로 호출합니다.
+    schedule = await vectordb.search_db_query_delete(member_id, question)  # vector db에서 검색
+
+    # description: give NESS's ideal instruction as template
+    case4_template = openai_prompt.Template.case4_template
+
+    prompt = PromptTemplate.from_template(case4_template)
+    seoul_timezone = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(seoul_timezone)
+    print(f'current time: {current_time}')
     response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
     print(response)
     return response

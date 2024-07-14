@@ -13,6 +13,7 @@ class ChatResponse(BaseModel):
 class ChatCaseResponse(BaseModel):
     ness: str
     case: int
+    metadata: str
 
 class TagDescription(BaseModel):
     tag: str
