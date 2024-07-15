@@ -181,9 +181,6 @@ class Template:
     Response: Good morning! You have two meetings scheduled for tomorrow: the project status update at 10 AM and the client discussion at 3 PM. Would you like reminders for these, or is there anything else I can assist you with?
     
     Now respond to following User input, based on RAG Retrieval.
-    User input: {question},
-    RAG Retrieval: {schedule}
-    Response:
     """
 
     case4_template = """

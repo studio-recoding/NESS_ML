@@ -170,7 +170,7 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         # 이전 대화 내역 가져오기
         previous_conversations = fetch_previous_conversations(member_id)
         print(previous_conversations)
-        
+
         question = data.prompt
         persona = data.persona
         user_persona_prompt = persona_prompt.Template.from_persona(persona)
@@ -182,7 +182,7 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         chat_prompt = ChatPromptTemplate.from_messages(
             previous_conversations + [
                 ("system", case2_template),
-                ("human", "{question}")
+                ("human", "User input: {question}")
             ]
         )
 
@@ -231,24 +231,54 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
                             model_name=config_normal['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
+
     member_id = data.member_id
     question = data.prompt
     persona = data.persona
     user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
-    # vectordb.search_db_query를 비동기적으로 호출합니다.
-    schedule = await vectordb.search_db_query(member_id, question)  # vector db에서 검색
-
-    # description: give NESS's ideal instruction as template
-    case3_template = openai_prompt.Template.case3_template
-
-    prompt = PromptTemplate.from_template(case3_template)
+    # 시간 가져오기
     seoul_timezone = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(seoul_timezone)
     print(f'current time: {current_time}')
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
-    print(response)
-    return response
+
+    # 관련 스케줄 가져오기
+    schedule = await vectordb.search_db_query(member_id, question)  # vector db에서 검색
+
+    # 이전 대화 내역 불러오기
+    previous_conversations = fetch_previous_conversations(member_id)
+    print(previous_conversations)
+    
+    # description: give NESS's ideal instruction as template
+    case3_template = openai_prompt.Template.case3_template
+    case3_user = """
+    User input: {question},
+    RAG Retrieval: {schedule}
+    Response:
+    """
+    #prompt = PromptTemplate.from_template(case3_template)
+    # system, human, ai
+    chat_prompt = ChatPromptTemplate.from_messages(
+        previous_conversations + [
+            ("system", case3_template),
+            ("human", case3_user)
+        ]
+    )
+
+    #response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
+    # 프롬프트와 모델을 chaining
+    chain = chat_prompt | chat_model
+
+    response = chain.invoke({
+        "persona": user_persona_prompt,
+        "output_language": "Korean",
+        "current_time": current_time,
+        "chat_type": chat_type_prompt,
+        "schedule": schedule,
+        "question": question
+    })
+    print(response.content)
+    return response.content
 
 # case 4 : delete schedule
 async def delete_schedule(data: PromptRequest, chat_type_prompt):
