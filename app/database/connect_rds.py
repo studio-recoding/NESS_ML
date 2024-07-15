@@ -30,3 +30,32 @@ def fetch_category_classification_data(member_id):
             return result
     finally:
         connection.close()
+
+def fetch_previous_conversations(member_id):
+    connection = get_rds_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+                SELECT c.text, c.chat_type
+                FROM chat c
+                WHERE c.member_id = %s
+                ORDER BY c.created_date DESC
+                LIMIT 5
+                """
+            cursor.execute(sql, (member_id,))
+            result = cursor.fetchall()
+            formatted_result = []
+            for chat in result:
+                # chat_type에 따라 'system' 또는 'human'으로 설정
+                sender_type = 'ai' if chat['chat_type'] == 'AI' else 'human'
+                # 메시지 포맷팅
+                formatted_result.append((sender_type, chat['text']))
+            return formatted_result[::-1]  # 최신 메시지가 마지막에 오도록 순서를 뒤집습니다.
+            return result
+    except Exception as e:
+        print("Error fetching conversations:", e, file=sys.stderr)
+        return []  # 오류 발생 시 빈 리스트 반환
+    finally:
+        connection.close()
+
+

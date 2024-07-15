@@ -112,7 +112,6 @@ class Template:
             {persona}
             {chat_type}
             YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Current time is {current_time}. Respond to the user considering the current time.
-            User input: {question}
             """
 
     case2_template = """

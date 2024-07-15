@@ -5,10 +5,11 @@ import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, status
 from langchain_community.chat_models import ChatOpenAI
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
+from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from datetime import datetime
 
-from app.database.connect_rds import fetch_category_classification_data
+from app.database.connect_rds import fetch_category_classification_data, fetch_previous_conversations
 from app.dto.openai_dto import PromptRequest, ChatResponse, ChatCaseResponse
 from app.prompt import openai_prompt, persona_prompt
 
@@ -98,20 +99,45 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
                             model_name=config_normal['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
+    # 유저 입력
     question = data.prompt
+    # 페르소나 프롬프트
     persona = data.persona
     user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
-    # description: give NESS's ideal instruction as template
-    my_template = openai_prompt.Template.case1_template
-
-    prompt = PromptTemplate.from_template(my_template)
+    # 현재 시각 설정
     seoul_timezone = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(seoul_timezone)
     print(f'current time: {current_time}')
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
-    print(response)
-    return response
+
+    # 이전 대화내역 불러오기
+    previous_conversations = fetch_previous_conversations(data.member_id)
+    print(previous_conversations)
+
+    # case 1 프롬프트
+    case1_template = openai_prompt.Template.case1_template
+    #prompt = PromptTemplate.from_template(my_template)
+    # system, human, ai
+    chat_prompt = ChatPromptTemplate.from_messages(
+        previous_conversations + [
+            ("system", case1_template),
+            ("human", "{question}")
+        ]
+    )
+
+    # 프롬프트와 모델을 chaining
+    chain = chat_prompt | chat_model
+
+    #response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
+    response = chain.invoke({
+        "persona": user_persona_prompt,
+        "output_language": "Korean",
+        "current_time": current_time,
+        "chat_type": chat_type_prompt,
+        "question": question
+    })
+    print(response.content)
+    return response.content
 
 # case 2 : 일정 생성
 #@router.post("/case/make_schedule") # 테스트용 엔드포인트
