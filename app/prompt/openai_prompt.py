@@ -150,7 +150,7 @@ class Template:
                   "id": 1,
                   "color": "#FF0000"
                 }},
-                "search keyword": "nearby parking Dr. Smith's office"
+                "search_keyword": "nearby parking Dr. Smith's office"
               }},
               {{
                 "info": "dinner with John",
@@ -163,7 +163,7 @@ class Template:
                   "id": 2,
                   "color": "#00FF00"
                 }},
-                "searchKeyword": "top Italian wines"
+                "search_keyword": "top Italian wines"
               }}
             ]
     """
