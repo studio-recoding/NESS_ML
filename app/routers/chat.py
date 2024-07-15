@@ -144,15 +144,6 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
 async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
     try:
         print("running case 2")
-        member_id = data.member_id
-        categories = fetch_category_classification_data(member_id)
-        # 카테고리 데이터를 딕셔너리 형태로 변환
-        categories_dict = [
-            {"name": category['name'], "id": category['category_id'], "color": category['color']}
-            for category in categories
-        ]
-
-        # description: use langchain
         config_normal = config['NESS_NORMAL']
 
         chat_model = ChatOpenAI(temperature=config_normal['TEMPERATURE'],  # 창의성 (0.0 ~ 2.0)
@@ -161,30 +152,68 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
                                 openai_api_key=OPENAI_API_KEY  # API 키
                                 )
 
-        question = data.prompt
-        persona = data.persona
-        user_persona_prompt = persona_prompt.Template.from_persona(persona)
-        case2_template = openai_prompt.Template.case2_template
+        member_id = data.member_id
 
-        prompt = PromptTemplate.from_template(case2_template)
+        # 카테고리 가져오기
+        categories = fetch_category_classification_data(member_id)
+        # 카테고리 데이터를 딕셔너리 형태로 변환
+        categories_dict = [
+            {"name": category['name'], "id": category['category_id'], "color": category['color']}
+            for category in categories
+        ]
+
+        # 시간 가져오기
         seoul_timezone = pytz.timezone('Asia/Seoul')
         current_time = datetime.now(seoul_timezone)
         print(f'current time: {current_time}')
 
-        # OpenAI 프롬프트에 데이터 통합
-        response = chat_model.predict(
-            prompt.format(
-                persona=user_persona_prompt,
-                output_language="Korean",
-                question=question,
-                current_time=current_time,
-                chat_type=chat_type_prompt,
-                categories=categories_dict  # 카테고리 데이터를 프롬프트에 포함
-            )
+        # 이전 대화 내역 가져오기
+        previous_conversations = fetch_previous_conversations(member_id)
+        print(previous_conversations)
+        
+        question = data.prompt
+        persona = data.persona
+        user_persona_prompt = persona_prompt.Template.from_persona(persona)
+
+        # case 2 프롬프트
+        case2_template = openai_prompt.Template.case2_template
+        # prompt = PromptTemplate.from_template(case2_template)
+        # system, human, ai
+        chat_prompt = ChatPromptTemplate.from_messages(
+            previous_conversations + [
+                ("system", case2_template),
+                ("human", "{question}")
+            ]
         )
 
-        print(response)
-        return response
+
+        # # OpenAI 프롬프트에 데이터 통합
+        # response = chat_model.predict(
+        #     prompt.format(
+        #         persona=user_persona_prompt,
+        #         output_language="Korean",
+        #         question=question,
+        #         current_time=current_time,
+        #         chat_type=chat_type_prompt,
+        #         categories=categories_dict  # 카테고리 데이터를 프롬프트에 포함
+        #     )
+        # )
+
+        # 프롬프트와 모델을 chaining
+        chain = chat_prompt | chat_model
+
+        # response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, current_time=current_time, chat_type=chat_type_prompt))
+        response = chain.invoke({
+            "persona": user_persona_prompt,
+            "output_language": "Korean",
+            "current_time": current_time,
+            "chat_type": chat_type_prompt,
+            "categories": categories_dict,
+            "question": question
+        })
+
+        print(response.content)
+        return response.content
 
     except Exception as e:
         print(e)

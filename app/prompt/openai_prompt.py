@@ -163,13 +163,9 @@ class Template:
                   "id": 2,
                   "color": "#00FF00"
                 }},
-                "search keyword": "top Italian wines"
+                "searchKeyword": "top Italian wines"
               }}
             ]
-            
-            User input: {question}
-            
-            Response to user:
     """
 
     case3_template = """
