@@ -112,7 +112,6 @@ class Template:
             {persona}
             {chat_type}
             YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Current time is {current_time}. Respond to the user considering the current time.
-            User input: {question}
             """
 
     case2_template = """
@@ -164,13 +163,9 @@ class Template:
                   "id": 2,
                   "color": "#00FF00"
                 }},
-                "search keyword": "top Italian wines"
+                "searchKeyword": "top Italian wines"
               }}
             ]
-            
-            User input: {question}
-            
-            Response to user:
     """
 
     case3_template = """
@@ -186,9 +181,6 @@ class Template:
     Response: Good morning! You have two meetings scheduled for tomorrow: the project status update at 10 AM and the client discussion at 3 PM. Would you like reminders for these, or is there anything else I can assist you with?
     
     Now respond to following User input, based on RAG Retrieval.
-    User input: {question},
-    RAG Retrieval: {schedule}
-    Response:
     """
 
     case4_template = """
