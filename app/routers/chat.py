@@ -248,7 +248,7 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
     # 이전 대화 내역 불러오기
     previous_conversations = fetch_previous_conversations(member_id)
     print(previous_conversations)
-    
+
     # description: give NESS's ideal instruction as template
     case3_template = openai_prompt.Template.case3_template
     case3_user = """
@@ -296,16 +296,48 @@ async def delete_schedule(data: PromptRequest, chat_type_prompt):
     persona = data.persona
     user_persona_prompt = persona_prompt.Template.from_persona(persona)
 
-    # vectordb.search_db_query를 비동기적으로 호출합니다.
-    schedule = await vectordb.search_db_query_delete(member_id, question)  # vector db에서 검색
-
-    # description: give NESS's ideal instruction as template
-    case4_template = openai_prompt.Template.case4_template
-
-    prompt = PromptTemplate.from_template(case4_template)
+    # 시간 정보 가져오기
     seoul_timezone = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(seoul_timezone)
     print(f'current time: {current_time}')
-    response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
-    print(response)
-    return response
+
+    # vectordb.search_db_query를 호출
+    schedule = await vectordb.search_db_query_delete(member_id, question)
+
+    # 이전 대화 내역 불러오기
+    previous_conversations = fetch_previous_conversations(member_id)
+    print(previous_conversations)
+
+    # description: give NESS's ideal instruction as template
+    case4_template = openai_prompt.Template.case4_template
+    case4_user = """     
+    User input: {question}
+    
+    Schedules: {schedule}
+    
+    Response to user:
+    """
+    # system, human, ai
+    chat_prompt = ChatPromptTemplate.from_messages(
+        previous_conversations + [
+            ("system", case4_template),
+            ("human", case4_user)
+        ]
+    )
+
+    # prompt = PromptTemplate.from_template(case4_template)
+    chain = chat_prompt | chat_model
+
+    response = chain.invoke({
+        "persona": user_persona_prompt,
+        "output_language": "Korean",
+        "current_time": current_time,
+        "chat_type": chat_type_prompt,
+        "schedule": schedule,
+        "question": question
+    })
+    print(response.content)
+    return response.content
+    #response = chat_model.predict(prompt.format(persona=user_persona_prompt, output_language="Korean", question=question, schedule=schedule, current_time=current_time, chat_type=chat_type_prompt))
+    # print(response)
+    # return response
