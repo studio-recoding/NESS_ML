@@ -41,11 +41,13 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
                             model_name=config_chat['MODEL_NAME'],  # 모델명
                             openai_api_key=OPENAI_API_KEY  # API 키
                             )
+
+    # 이전 대화 내역 가져오기
+    previous_conversations = fetch_previous_conversations(data.member_id)
+    print(previous_conversations)
+
     question = data.prompt # 유저로부터 받은 채팅의 내용
     chat_type = data.chatType # 위스퍼 사용 여부 [STT, USER]
-
-    # description: give NESS's instruction as for case analysis
-    my_template = openai_prompt.Template.case_classify_template
 
     # chat type에 따라 적합한 프롬프트를 삽입
     if chat_type == "STT":
@@ -55,8 +57,27 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     else:
         raise HTTPException(status_code=500, detail="WRONG CHAT TYPE")
 
-    prompt = PromptTemplate.from_template(my_template)
-    case = chat_model.predict(prompt.format(question=question, chat_type=chat_type_prompt))
+    # description: give NESS's instruction as for case analysis
+    case_classify_template = openai_prompt.Template.case_classify_template
+    # prompt = PromptTemplate.from_template(my_template)
+
+    # system, human, ai
+    chat_prompt = ChatPromptTemplate.from_messages(
+        previous_conversations + [
+            ("system", case_classify_template),
+            ("human", "User Chat: {question}\nAnswer: ")
+        ]
+    )
+    # case = chat_model.predict(prompt.format(question=question, chat_type=chat_type_prompt))
+    # 프롬프트와 모델을 chaining
+    chain = chat_prompt | chat_model
+
+    response = chain.invoke({
+        "chat_type": chat_type_prompt,
+        "question": question
+    })
+
+    case = response.content
 
     # 각 케이스에도 chat type에 따라 적합한 프롬프트 삽입 필요
     print(case)
