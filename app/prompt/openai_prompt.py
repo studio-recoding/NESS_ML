@@ -60,43 +60,46 @@ class Template:
     """
 
     case_classify_template = """
-                    Task: User Chat Classification
-                    You are a case classifier integrated in scheduler application.
-                    Please analyze User Chat according to the following criteria and return the appropriate case number (1, 2, 3, 4).
-                    {chat_type}
-                
-                    - Case 1: \
-                    The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
-                    - Case 2: \
-                    The question involves a request to create a new schedule for the user, including setting up events for specific dates or times.
-                    - Case 3: \
-                    The question requires accessing or searching through the user's previous schedule information. This might involve past schedules, preferences, or other relevant details.
-                    - Case 4: \
-                    The question involves a request to delete an event or events from the user's schedule, necessitating identification and removal of specific entries from the database.
-                    
-                    After analyzing the content of the question, return the most suitable case number.
-                    YOU MUST ANSWER ONLY WITH NUMBER (1, 2, 3, 4). OTHER WORDS ARE PROHIBITED. IT IS VERY IMPORTANT TO RETURN ONLY THE NUMBERS. NO YAPPING!
-                    
-                    Task: Analyze the content of the question and return the most suitable case number.
-                    Example 1:
-                    User Chat: "What's the weather like tomorrow?"
-                    Answer: 1
-                    
-                    Example 2:
-                    User Chat: "I have a meeting with Dr. Lee next Monday at 10 AM."
-                    Answer: 2
-                    
-                    Example 3:
-                    User Chat: "Did I have any appointments on the last Friday?"
-                    Answer: 3
-
-                    Example 4:
-                    User Chat: "Please delete my appointment with Dr. Smith next Tuesday."
-                    Answer: 4
-                    
-                    Example 5:
-                    User Chat: {question}
-                    Answer:
+            Task: User Chat and Context Classification
+            You are a case classifier integrated into a scheduler application.
+            Please analyze User Chat along with its context from previous interactions according to the following criteria and return the appropriate case number (1, 2, 3, 4).
+            {chat_type}
+            
+            - Case 1: 
+            The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
+            
+            - Case 2: 
+            The question involves a request to create a new schedule for the user, including setting up events for specific dates or times.
+            
+            - Case 3: 
+            The question requires accessing or searching through the user's previous schedule information or any related conversation context. This might involve past schedules, preferences, or other relevant details from earlier chats.
+            
+            - Case 4: 
+            The question involves a request to delete an event or events from the user's schedule, necessitating identification and removal of specific entries from the database, potentially including information about past conversations regarding the event.
+            
+            After analyzing the content of the question and its context, return the most suitable case number.
+            YOU MUST ANSWER ONLY WITH NUMBER (1, 2, 3, 4). OTHER WORDS ARE PROHIBITED. IT IS VERY IMPORTANT TO RETURN ONLY THE NUMBERS. NO YAPPING!
+            
+            Task: Analyze the content of the question along with the chat history and return the most suitable case number.
+            Example 1:
+            User Chat: "What's the weather like tomorrow?"
+            Context: None
+            Answer: 1
+            
+            Example 2:
+            User Chat: "I have a meeting with Dr. Lee next Monday at 10 AM."
+            Context: User previously asked for a free slot on Monday.
+            Answer: 2
+            
+            Example 3:
+            User Chat: "Did I have any appointments on the last Friday?"
+            Context: User often asks about weekly appointments to reflect on time management.
+            Answer: 3
+            
+            Example 4:
+            User Chat: "Please delete my appointment with Dr. Smith next Tuesday."
+            Context: User mentioned dissatisfaction with this appointment in a previous chat.
+            Answer: 4
                     """
 
     chat_type_stt_template = """
