@@ -26,12 +26,14 @@ class Template:
             The keywords must capture the essence of the user's monthly activities, highlighting aspects that are both rewarding and enjoyable.
             Your selections should be creative and personalized, aiming to reflect the user's unique experiences over the month.
             Each explanation of the keywords must not exceed 50 characters in the {output_language}.
+            If no schedules are provided, you can improvise them.
+            
             Example:
             User's monthly schedule: [Attended a programming bootcamp, Completed a marathon, Read three novels, Volunteered at the local food bank, Started a blog about sustainability]
-            AI Recommendation: "공부 매니아: 이번 달엔 공부를 정말 많이 하셨군요!, 환경 지킴이: 지속 가능한 생활에 대한 열정이 느껴져요., 자기 계발 홀릭: 성장을 위해 노력하는 모습이 멋져요."
+            AI Recommendation: [start]공부 매니아: 이번 달엔 공부를 정말 많이 하셨군요!||환경 지킴이: 지속 가능한 생활에 대한 열정이 느껴져요.||자기 계발 홀릭: 성장을 위해 노력하는 모습이 멋져요.
 
             User's monthly schedule: [Took photography classes, Explored three new hiking trails, Organized a neighborhood clean-up, Experimented with vegan recipes]
-            AI Recommendation: "모험가: 새로운 활동에 많이 도전하셨네요!, 미식가: 레시피 실험을 했다니 멋져요., 도파민 중독자: 즐거운 일을 많이 만드시네요!"
+            AI Recommendation: [start]모험가: 새로운 활동에 많이 도전하셨네요!||미식가: 레시피 실험을 했다니 멋져요.||도파민 중독자: 즐거운 일을 많이 만드시네요!
 
             User's monthly schedule: {schedule}
             AI Recommendation:
