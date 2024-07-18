@@ -83,20 +83,20 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
     print(case)
     case = int(case)
     if case == 1:
-        response = await get_langchain_normal(data, chat_type_prompt)
+        response = await get_langchain_normal(data, chat_type_prompt, previous_conversations)
         metadata = "null"
 
     elif case == 2:
-        response_with_metadata = await get_langchain_schedule(data, chat_type_prompt)
+        response_with_metadata = await get_langchain_schedule(data, chat_type_prompt, previous_conversations)
         response = response_with_metadata.split("<separate>")[0]
         metadata = response_with_metadata.split("<separate>")[1]
 
     elif case == 3:
-        response = await get_langchain_rag(data, chat_type_prompt)
+        response = await get_langchain_rag(data, chat_type_prompt, previous_conversations)
         metadata = "null"
 
     elif case == 4:
-        response_with_metadata = await delete_schedule(data, chat_type_prompt)
+        response_with_metadata = await delete_schedule(data, chat_type_prompt, previous_conversations)
         response = response_with_metadata.split("<separate>")[0]
         metadata = response_with_metadata.split("<separate>")[1]
 
@@ -110,7 +110,7 @@ async def get_langchain_case(data: PromptRequest) -> ChatCaseResponse:
 
 # case 1 : normal
 #@router.post("/case/normal") # 테스트용 엔드포인트
-async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 : normal
+async def get_langchain_normal(data: PromptRequest, chat_type_prompt, previous_conversations): # case 1 : normal
     print("running case 1")
     # description: use langchain
     config_normal = config['NESS_NORMAL']
@@ -130,10 +130,6 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
     seoul_timezone = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(seoul_timezone)
     print(f'current time: {current_time}')
-
-    # 이전 대화내역 불러오기
-    previous_conversations = fetch_previous_conversations(data.member_id)
-    print(previous_conversations)
 
     # case 1 프롬프트
     case1_template = openai_prompt.Template.case1_template
@@ -162,7 +158,7 @@ async def get_langchain_normal(data: PromptRequest, chat_type_prompt): # case 1 
 
 # case 2 : 일정 생성
 #@router.post("/case/make_schedule") # 테스트용 엔드포인트
-async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
+async def get_langchain_schedule(data: PromptRequest, chat_type_prompt, previous_conversations):
     try:
         print("running case 2")
         config_normal = config['NESS_NORMAL']
@@ -187,10 +183,6 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
         seoul_timezone = pytz.timezone('Asia/Seoul')
         current_time = datetime.now(seoul_timezone)
         print(f'current time: {current_time}')
-
-        # 이전 대화 내역 가져오기
-        previous_conversations = fetch_previous_conversations(member_id)
-        print(previous_conversations)
 
         question = data.prompt
         persona = data.persona
@@ -242,7 +234,7 @@ async def get_langchain_schedule(data: PromptRequest, chat_type_prompt):
 
 # case 3 : rag
 #@router.post("/case/rag") # 테스트용 엔드포인트
-async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
+async def get_langchain_rag(data: PromptRequest, chat_type_prompt, previous_conversations):
     print("running case 3")
     # description: use langchain
     config_normal = config['NESS_NORMAL']
@@ -265,10 +257,7 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
 
     # 관련 스케줄 가져오기
     schedule = await vectordb.search_db_query(member_id, question)  # vector db에서 검색
-
-    # 이전 대화 내역 불러오기
-    previous_conversations = fetch_previous_conversations(member_id)
-    print(previous_conversations)
+    print(schedule)
 
     # description: give NESS's ideal instruction as template
     case3_template = openai_prompt.Template.case3_template
@@ -302,7 +291,7 @@ async def get_langchain_rag(data: PromptRequest, chat_type_prompt):
     return response.content
 
 # case 4 : delete schedule
-async def delete_schedule(data: PromptRequest, chat_type_prompt):
+async def delete_schedule(data: PromptRequest, chat_type_prompt, previous_conversations):
     print("running case 4: delete schedule")
 
     config_normal = config['NESS_NORMAL']
@@ -324,10 +313,6 @@ async def delete_schedule(data: PromptRequest, chat_type_prompt):
 
     # vectordb.search_db_query를 호출
     schedule = await vectordb.search_db_query_delete(member_id, question)
-
-    # 이전 대화 내역 불러오기
-    previous_conversations = fetch_previous_conversations(member_id)
-    print(previous_conversations)
 
     # description: give NESS's ideal instruction as template
     case4_template = openai_prompt.Template.case4_template

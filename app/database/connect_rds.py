@@ -38,7 +38,7 @@ def fetch_previous_conversations(member_id):
             sql = """
                 SELECT c.text, c.chat_type
                 FROM chat c
-                WHERE c.member_id = %s
+                WHERE c.member_id = %s AND c.created_date >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
                 ORDER BY c.created_date DESC
                 LIMIT 5
                 """
