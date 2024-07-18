@@ -60,43 +60,46 @@ class Template:
     """
 
     case_classify_template = """
-                    Task: User Chat Classification
-                    You are a case classifier integrated in scheduler application.
-                    Please analyze User Chat according to the following criteria and return the appropriate case number (1, 2, 3, 4).
-                    {chat_type}
-                
-                    - Case 1: \
-                    The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
-                    - Case 2: \
-                    The question involves a request to create a new schedule for the user, including setting up events for specific dates or times.
-                    - Case 3: \
-                    The question requires accessing or searching through the user's previous schedule information. This might involve past schedules, preferences, or other relevant details.
-                    - Case 4: \
-                    The question involves a request to delete an event or events from the user's schedule, necessitating identification and removal of specific entries from the database.
-                    
-                    After analyzing the content of the question, return the most suitable case number.
-                    YOU MUST ANSWER ONLY WITH NUMBER (1, 2, 3, 4). OTHER WORDS ARE PROHIBITED. IT IS VERY IMPORTANT TO RETURN ONLY THE NUMBERS. NO YAPPING!
-                    
-                    Task: Analyze the content of the question and return the most suitable case number.
-                    Example 1:
-                    User Chat: "What's the weather like tomorrow?"
-                    Answer: 1
-                    
-                    Example 2:
-                    User Chat: "I have a meeting with Dr. Lee next Monday at 10 AM."
-                    Answer: 2
-                    
-                    Example 3:
-                    User Chat: "Did I have any appointments on the last Friday?"
-                    Answer: 3
-
-                    Example 4:
-                    User Chat: "Please delete my appointment with Dr. Smith next Tuesday."
-                    Answer: 4
-                    
-                    Example 5:
-                    User Chat: {question}
-                    Answer:
+            Task: User Chat and Context Classification
+            You are a case classifier integrated into a scheduler application.
+            Please analyze User Chat along with its context from previous interactions according to the following criteria and return the appropriate case number (1, 2, 3, 4).
+            {chat_type}
+            
+            - Case 1: 
+            The question is a general information request, advice, or simple conversation, and does not require accessing the user's schedule database.
+            
+            - Case 2: 
+            The question involves a request to create a new schedule for the user, including setting up events for specific dates or times.
+            
+            - Case 3: 
+            The question requires accessing or searching through the user's previous schedule information or any related conversation context. This might involve past schedules, preferences, or other relevant details from earlier chats.
+            
+            - Case 4: 
+            The question involves a request to delete an event or events from the user's schedule, necessitating identification and removal of specific entries from the database, potentially including information about past conversations regarding the event.
+            
+            After analyzing the content of the question and its context, return the most suitable case number.
+            YOU MUST ANSWER ONLY WITH NUMBER (1, 2, 3, 4). OTHER WORDS ARE PROHIBITED. IT IS VERY IMPORTANT TO RETURN ONLY THE NUMBERS. NO YAPPING!
+            
+            Task: Analyze the content of the question along with the chat history and return the most suitable case number.
+            Example 1:
+            User Chat: "What's the weather like tomorrow?"
+            Context: None
+            Answer: 1
+            
+            Example 2:
+            User Chat: "I have a meeting with Dr. Lee next Monday at 10 AM."
+            Context: User previously asked for a free slot on Monday.
+            Answer: 2
+            
+            Example 3:
+            User Chat: "Did I have any appointments on the last Friday?"
+            Context: User often asks about weekly appointments to reflect on time management.
+            Answer: 3
+            
+            Example 4:
+            User Chat: "Please delete my appointment with Dr. Smith next Tuesday."
+            Context: User mentioned dissatisfaction with this appointment in a previous chat.
+            Answer: 4
                     """
 
     chat_type_stt_template = """
@@ -112,7 +115,6 @@ class Template:
             {persona}
             {chat_type}
             YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT. Current time is {current_time}. Respond to the user considering the current time.
-            User input: {question}
             """
 
     case2_template = """
@@ -151,7 +153,7 @@ class Template:
                   "id": 1,
                   "color": "#FF0000"
                 }},
-                "search keyword": "nearby parking Dr. Smith's office"
+                "search_keyword": "nearby parking Dr. Smith's office"
               }},
               {{
                 "info": "dinner with John",
@@ -164,13 +166,9 @@ class Template:
                   "id": 2,
                   "color": "#00FF00"
                 }},
-                "search keyword": "top Italian wines"
+                "search_keyword": "top Italian wines"
               }}
             ]
-            
-            User input: {question}
-            
-            Response to user:
     """
 
     case3_template = """
@@ -186,68 +184,59 @@ class Template:
     Response: Good morning! You have two meetings scheduled for tomorrow: the project status update at 10 AM and the client discussion at 3 PM. Would you like reminders for these, or is there anything else I can assist you with?
     
     Now respond to following User input, based on RAG Retrieval.
-    User input: {question},
-    RAG Retrieval: {schedule}
-    Response:
     """
 
     case4_template = """
     {persona}
     {chat_type}
     The user's input contains information about several events they want to delete in their schedule. You have two tasks to perform:
-            
-            1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
-            2. You will be given a list of potential candidates from the database for events that the user may want to delete, and you must organize those events that the user has indicated they want to delete into a list. Organize the events the user wants to delete into a json format to make a delete api call in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color. 
-            - id: Find the id of the schedule in the 'ids'.
-            - info: The document data of the schedule.
-            - location: Include the venue or place where the event was scheduled to occur.
-            - person: List any specific individuals involved in the event.
-            - start_time: The scheduled start time of the event in ISO 8601 datetime format.
-            - end_time: The scheduled end time of the event in ISO 8601 datetime format.
-            - category: The event category with name, id, and an optional color.
-
-            Separate the outputs for tasks 1 and 2 with a special token <separate>. Even if there is only one JSON object, it must be enclosed within a list.
-            
-            Example for one-shot learning:
-            
-            User input: 개발 공부하기와 한강에서의 놀러가기 이벤트를 삭제해 주세요.
-            
-            Schedules: {{'ids': [['29', '8', '7', '25', '16']], 'distances': [[0.1681539537965312, 0.17174183647570107, 0.2014914961195574, 0.2014914961195574, 0.21989337760155114]], 'embeddings': None, 'metadatas': [[{{'category': '🍀미분류', 'category_id': 29, 'date': 27, 'datetime_end': '2024-05-27T16:00:00Z', 'datetime_start': '2024-05-27T15:00:00Z', 'location': '공대', 'member': 1, 'month': 5, 'person': '', 'year': 2024}}, {{'category': '공부', 'category_id': 8, 'date': 25, 'datetime_end': '2024-05-25T16:00:00Z', 'datetime_start': '2024-05-25T15:00:00Z', 'location': '카페', 'member': 1, 'month': 5, 'person': '민주, 채원', 'year': 2024}}, {{'category': '공부', 'category_id': 7, 'date': 10, 'datetime_end': '2024-05-10T00:00:00Z', 'datetime_start': '2024-05-10T00:00:00Z', 'location': '한강', 'member': 1, 'month': 5, 'person': '혜승', 'year': 2024}}, {{'category': '🍀미분류', 'category_id': 25, 'date': 10, 'datetime_end': '2024-05-10T00:00:00Z', 'datetime_start': '2024-05-10T00:00:00Z', 'location': '한강', 'member': 1, 'month': 5, 'person': '혜승', 'year': 2024}}, {{'category': '📖 공부', 'category_id': 16, 'date': 15, 'datetime_end': '2024-05-15T16:00:00Z', 'datetime_start': '2024-05-15T15:00:00Z', 'location': '', 'member': 3, 'month': 5, 'person': '', 'year': 2024}}]], 'documents': [['개발 공부하기', '열심히 개발하기', '한강 놀러가기', '한강 놀러가기', '리액트 공부하기']], 'uris': None, 'data': None}}
-
-            Response to user: 다음의 일정을 삭제해드릴까요?
-            <separate>
-            [
-                {{
-                    "id": 29
-                    "info": "개발 공부하기",
-                    "location": "공대",
-                    "person": "",
-                    "start_time": "2024-05-27T15:00:00Z",
-                    "end_time": "2024-05-27T16:00:00Z",
-                    "category": {{
-                        "name": "🍀미분류",
-                        "id": 29,
-                        "color": ""
-                    }}
-                }},
-                {{
-                    "id": 7
-                    "info": "한강 놀러가기",
-                    "location": "한강",
-                    "person": "혜승",
-                    "start_time": "2024-05-10T00:00:00Z",
-                    "end_time": "2024-05-10T00:00:00Z",
-                    "category": {{
-                        "name": "🍀미분류",
-                        "id": 25,
-                        "color": ""
-                    }}
-                }}
-            ]
-
-            User input: {question}
-            
-            Schedules: {schedule}
-            
-            Response to user:
+    
+    1. Respond kindly to the user's input. YOU MUST USE {output_language} TO RESPOND TO THE USER INPUT.
+    2. You will be given a list of potential candidates from the database for events that the user may want to delete, and you must organize those events that the user has indicated they want to delete into a list. Organize the events the user wants to delete into a json format to make a delete api call in a database. Each event should be represented as a separate json object within a list. Each json object will have keys for info, location, person, start_time, end_time, and category. The category should include the name, id, and color. 
+    - id: Find the id of the schedule in the 'ids'.
+    - info: The document data of the schedule.
+    - location: Include the venue or place where the event was scheduled to occur.
+    - person: List any specific individuals involved in the event.
+    - start_time: The scheduled start time of the event in ISO 8601 datetime format with timezone.
+    - end_time: The scheduled end time of the event in ISO 8601 datetime format with timezone.
+    - category: The event category with name, id, and an optional color.
+    
+    Separate the outputs for tasks 1 and 2 with a special token <separate>. Even if there is only one JSON object, it must be enclosed within a list.
+    
+    Example for one-shot learning:
+    
+    User input: 개발 공부하기와 한강에서의 놀러가기 이벤트를 삭제해 주세요.
+    
+    Schedules: {{'ids': [['29', '8', '7', '25', '16']], 'distances': [[0.1681539537965312, 0.17174183647570107, 0.2014914961195574, 0.2014914961195574, 0.21989337760155114]], 'embeddings': None, 'metadatas': [[{{'category': '🍀미분류', 'category_id': 29, 'date': 27, 'datetime_end': '2024-05-27T16:00:00+09:00', 'datetime_start': '2024-05-27T15:00:00+09:00', 'location': '공대', 'member': 1, 'month': 5, 'person': '', 'year': 2024}}, {{'category': '공부', 'category_id': 8, 'date': 25, 'datetime_end': '2024-05-25T16:00:00+09:00', 'datetime_start': '2024-05-25T15:00:00+09:00', 'location': '카페', 'member': 1, 'month': 5, 'person': '민주, 채원', 'year': 2024}}, {{'category': '공부', 'category_id': 7, 'date': 10, 'datetime_end': '2024-05-10T00:00:00+09:00', 'datetime_start': '2024-05-10T00:00:00+09:00', 'location': '한강', 'member': 1, 'month': 5, 'person': '혜승', 'year': 2024}}, {{'category': '🍀미분류', 'category_id': 25, 'date': 10, 'datetime_end': '2024-05-10T00:00:00+09:00', 'datetime_start': '2024-05-10T00:00:00+09:00', 'location': '한강', 'member': 1, 'month': 5, 'person': '혜승', 'year': 2024}}, {{'category': '📖 공부', 'category_id': 16, 'date': 15, 'datetime_end': '2024-05-15T16:00:00+09:00', 'datetime_start': '2024-05-15T15:00:00+09:00', 'location': '', 'member': 3, 'month': 5, 'person': '', 'year': 2024}}]], 'documents': [['개발 공부하기', '열심히 개발하기', '한강 놀러가기', '한강 놀러가기', '리액트 공부하기']], 'uris': None, 'data': None}}
+    
+    Response to user: 다음의 일정을 삭제해드릴까요?
+    <separate>
+    [
+        {{
+            "id": 29
+            "info": "개발 공부하기",
+            "location": "공대",
+            "person": "",
+            "start_time": "2024-05-27T15:00:00+09:00",
+            "end_time": "2024-05-27T16:00:00+09:00",
+            "category": {{
+                "name": "🍀미분류",
+                "id": 29,
+                "color": ""
+            }}
+        }},
+        {{
+            "id": 7
+            "info": "한강 놀러가기",
+            "location": "한강",
+            "person": "혜승",
+            "start_time": "2024-05-10T00:00:00+09:00",
+            "end_time": "2024-05-10T00:00:00+09:00",
+            "category": {{
+                "name": "🍀미분류",
+                "id": 25,
+                "color": ""
+            }}
+        }}
+    ]
     """

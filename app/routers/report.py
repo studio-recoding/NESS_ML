@@ -80,7 +80,7 @@ async def get_tags(user_data: ReportTagsRequestDTO) -> TagsResponse:
         print(result)
         
         # 문자열 파싱해서 dto로 매핑
-        tag_entries = result.split("\"")[1].split(", ")
+        tag_entries = result.split("[start]")[1].split("||")
         tags = []
 
         for entry in tag_entries:
